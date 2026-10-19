@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#14162d" />
+  <title>둘 중 하나! | 밸런스 게임</title>
+  <style>
+    /* 외부 라이브러리 없이 동작하도록 시스템 글꼴을 기본으로 사용합니다. */
+    :root { color-scheme: dark; font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif; --ink: #fff; --bg: #14162d; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body { background: var(--bg); color: var(--ink); overflow-x: hidden; }
+    button { font: inherit; cursor: pointer; }
+    button:focus-visible { outline: 4px solid #fff; outline-offset: -7px; }
+    .app { min-height: 100svh; display: flex; flex-direction: column; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px clamp(18px, 4vw, 60px); background: #14162d; }
+    .brand { font-size: clamp(16px, 2.2vw, 25px); font-weight: 900; letter-spacing: -.04em; }
+    .brand span { color: #ffe481; }
+    .progress { font-size: clamp(16px, 2.2vw, 25px); font-weight: 900; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+    .track { height: 6px; background: #30334c; }
+    .track > div { height: 100%; width: 0; background: #ffe481; transition: width .35s ease; }
+    .game { position: relative; display: flex; flex: 1; min-height: 0; isolation: isolate; }
+    .choice { flex: 1 1 50%; width: 50%; min-width: 0; min-height: max(300px, calc(100svh - 100px)); display: flex; flex-direction: column; align-items: center; justify-content: center; border: 0; color: #fff; padding: 48px clamp(20px, 4vw, 72px); text-align: center; position: relative; overflow: hidden; transition: flex-grow .45s cubic-bezier(.18,.78,.2,1), filter .45s ease, transform .45s ease, background .45s ease; }
+    .choice::before { content: ''; position: absolute; inset: 0; opacity: .11; background: radial-gradient(circle at 50% 35%, white, transparent 57%); pointer-events: none; }
+    .choice-a { background: #e95a75; }
+    .choice-b { background: #4869e6; }
+    .choice .mini { position: relative; z-index: 1; font-size: clamp(13px, 1.8vw, 20px); font-weight: 900; letter-spacing: .25em; opacity: .83; margin-bottom: 28px; }
+    .choice .answer { position: relative; z-index: 1; font-size: clamp(40px, 6vh, 94px); line-height: 1.25; font-weight: 950; word-break: keep-all; letter-spacing: -.055em; text-wrap: balance; max-width: 690px; text-shadow: 0 5px 24px #15152c24; }
+    .choice .hint { position: relative; z-index: 1; font-weight: 750; font-size: clamp(13px, 1.5vw, 19px); margin-top: 30px; opacity: .85; }
+    .choice:not(:disabled):hover { filter: brightness(1.08); }
+    .choice.selected { flex-grow: 1.35; filter: brightness(1.15) saturate(1.28); transform: scale(1.012); z-index: 1; }
+    .choice.not-selected { flex-grow: .65; filter: brightness(.55) saturate(.75); }
+    .choice:disabled { cursor: default; }
+    .versus { position: absolute; z-index: 3; top: 50%; left: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: clamp(70px, 8.5vw, 116px); height: clamp(70px, 8.5vw, 116px); border-radius: 999px; border: 6px solid #fff; color: #23253f; background: #fff0a6; box-shadow: 0 10px 38px #1113264d; font-size: clamp(23px, 3vw, 39px); font-weight: 1000; font-style: italic; pointer-events: none; }
+    .subline { text-align: center; padding: 9px 12px 12px; font-size: 12px; opacity: .72; }
+    /* 종료 화면 */
+    .results { display: none; flex: 1; width: 100%; max-width: 1160px; margin: 0 auto; padding: clamp(25px, 5vw, 65px) 20px 70px; }
+    .results.show { display: block; }
+    .results h1 { font-size: clamp(36px, 6vw, 70px); margin: 10px 0 12px; line-height: 1.2; letter-spacing: -.06em; }
+    .results .intro { color: #c6c7dd; font-size: clamp(16px, 2vw, 21px); margin: 0 0 30px; }
+    .result-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; list-style: none; margin: 0; padding: 0; }
+    .result-item { background: #232640; border: 1px solid #3b3d5b; border-radius: 20px; padding: 20px; min-width: 0; }
+    .result-num { display: block; font-size: 13px; font-weight: 900; color: #b9bbd2; margin-bottom: 10px; }
+    .result-pair { font-size: clamp(14px, 1.6vw, 18px); color: #c0c1d5; line-height: 1.5; word-break: keep-all; }
+    .result-picked { font-size: clamp(21px, 2.8vw, 29px); font-weight: 900; letter-spacing: -.04em; margin-top: 9px; word-break: keep-all; }
+    .result-picked.a { color: #ff91a8; }
+    .result-picked.b { color: #99b0ff; }
+    .restart { display: block; width: min(100%, 480px); margin: 36px auto 0; padding: 20px; border: 0; border-radius: 18px; background: #ffe481; color: #22243b; font-size: 22px; font-weight: 950; box-shadow: 0 8px 0 #d6b95a; transition: transform .15s; }
+    .restart:hover { transform: translateY(-3px); }
+    .restart:active { transform: translateY(4px); box-shadow: 0 4px 0 #d6b95a; }
+    .hidden { display: none !important; }
+    @media (max-width: 760px) {
+      .topbar { padding: 15px 18px; }
+      .game { flex-direction: column; }
+      .choice { width: 100%; min-height: 0; flex-basis: 50%; padding: 28px 24px; }
+      .choice .mini { margin-bottom: 12px; }
+      .choice .answer { font-size: clamp(40px, 6.5vh, 80px); }
+      .choice .hint { margin-top: 14px; }
+      .versus { width: 72px; height: 72px; font-size: 25px; border-width: 5px; }
+      .result-list { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) { .choice, .track > div, .restart { transition-duration: .01ms; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar" id="topbar">
+      <div class="brand">둘 중 <span>하나!</span> ✨</div>
+      <div class="progress" id="progress" aria-live="polite">1 / 15</div>
+    </header>
+    <div class="track" id="track"><div id="progressFill"></div></div>
+    <section class="game" id="game" aria-label="밸런스 게임 선택 화면">
+      <button class="choice choice-a" id="choiceA" type="button">
+        <span class="mini">OPTION A</span>
+        <span class="answer" id="answerA"></span>
+        <span class="hint">여기를 눌러 선택</span>
+      </button>
+      <div class="versus" aria-hidden="true">VS</div>
+      <button class="choice choice-b" id="choiceB" type="button">
+        <span class="mini">OPTION B</span>
+        <span class="answer" id="answerB"></span>
+        <span class="hint">여기를 눌러 선택</span>
+      </button>
+    </section>
+    <section class="results" id="results" aria-labelledby="resultsTitle">
+      <div style="font-size:20px;font-weight:900;color:#ffe481">🎉 게임 완료!</div>
+      <h1 id="resultsTitle">나의 선택 모아보기</h1>
+      <p class="intro">15번의 고민 끝에 고른 나만의 밸런스! 서로의 답을 비교해 보세요.</p>
+      <ol class="result-list" id="resultList"></ol>
+      <button class="restart" id="restart" type="button">🔀 섞어서 다시 하기</button>
+    </section>
+  </main>
+  <script>
+    'use strict';
+    // 기본 질문 15개: 누구나 가볍게 대답할 수 있는 주제로 구성했습니다.
+    const QUESTIONS = [
+      { a: '평생 여름 ☀️', b: '평생 겨울 ❄️' },
+      { a: '하루 종일 노래 듣기 🎧', b: '하루 종일 영화 보기 🎬' },
+      { a: '치킨은 바삭한 후라이드 🍗', b: '치킨은 달콤한 양념 🍖' },
+      { a: '순간이동 능력 🚀', b: '하늘을 나는 능력 🪽' },
+      { a: '여행은 바다로 🌊', b: '여행은 산으로 ⛰️' },
+      { a: '아침에 일찍 일어나기 🌅', b: '밤에 늦게 자기 🌙' },
+      { a: '문자로 길게 대화 💬', b: '전화로 짧게 대화 📞' },
+      { a: '계획 꽉 찬 여행 🗓️', b: '발길 닿는 대로 여행 🧳' },
+      { a: '평생 떡볶이만 먹기 🌶️', b: '평생 피자만 먹기 🍕' },
+      { a: '고양이와 하루 보내기 🐱', b: '강아지와 하루 보내기 🐶' },
+      { a: '하루 동안 투명인간 👻', b: '하루 동안 마음 읽기 🔮' },
+      { a: '놀이공원에서 놀기 🎢', b: '집에서 뒹굴거리기 🛋️' },
+      { a: '사진 100장 찍기 📸', b: '눈으로만 추억 담기 👀' },
+      { a: '아이스 아메리카노 🧊', b: '따뜻한 라떼 ☕' },
+      { a: '깜짝 선물 받기 🎁', b: '갖고 싶은 선물 고르기 🛍️' }
+    ];
+
+    const el = (id) => document.getElementById(id);
+    const game = el('game');
+    const results = el('results');
+    const buttons = [el('choiceA'), el('choiceB')];
+    let shuffled = [];
+    let picks = [];
+    let current = 0;
+    let locked = false;
+    let nextTimer = null;
+
+    // Fisher-Yates: 모든 순서가 같은 확률로 나올 수 있도록 배열을 섞습니다.
+    function shuffle(items) {
+      const arr = [...items];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // 초기 시작 및 다시 하기를 공통으로 처리합니다.
+    function start() {
+      if (nextTimer !== null) clearTimeout(nextTimer);
+      shuffled = shuffle(QUESTIONS);
+      picks = [];
+      current = 0;
+      locked = false;
+      results.classList.remove('show');
+      game.classList.remove('hidden');
+      el('track').classList.remove('hidden');
+      el('progress').classList.remove('hidden');
+      renderQuestion();
+    }
+
+    // 한 번에 하나의 질문만 표시합니다.
+    function renderQuestion() {
+      locked = false;
+      buttons.forEach((btn) => {
+        btn.disabled = false;
+        btn.classList.remove('selected', 'not-selected');
+      });
+      el('answerA').textContent = shuffled[current].a;
+      el('answerB').textContent = shuffled[current].b;
+      el('progress').textContent = `${current + 1} / ${shuffled.length}`;
+      el('progressFill').style.width = `${current / shuffled.length * 100}%`;
+    }
+
+    // 선택한 버튼을 강조하고 0.8초 뒤 자동으로 넘어갑니다.
+    function pick(side) {
+      if (locked) return; // 빠르게 여러 번 눌러도 중복 선택되지 않도록 방지합니다.
+      locked = true;
+      picks.push({ ...shuffled[current], side });
+      buttons.forEach((btn, index) => {
+        btn.disabled = true;
+        btn.classList.add(index === side ? 'selected' : 'not-selected');
+      });
+      el('progressFill').style.width = `${(current + 1) / shuffled.length * 100}%`;
+      nextTimer = setTimeout(() => {
+        current += 1;
+        if (current < shuffled.length) renderQuestion();
+        else showResults();
+      }, 800);
+    }
+
+    // DOM 요소는 문자열 HTML 삽입 대신 textContent를 사용해 안전하게 만듭니다.
+    function showResults() {
+      game.classList.add('hidden');
+      el('track').classList.add('hidden');
+      el('progress').classList.add('hidden');
+      const list = el('resultList');
+      list.replaceChildren();
+      picks.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.className = 'result-item';
+        const number = document.createElement('span');
+        number.className = 'result-num';
+        number.textContent = `QUESTION ${String(index + 1).padStart(2, '0')}`;
+        const pair = document.createElement('div');
+        pair.className = 'result-pair';
+        pair.textContent = `${item.a}  VS  ${item.b}`;
+        const chosen = document.createElement('div');
+        chosen.className = `result-picked ${item.side === 0 ? 'a' : 'b'}`;
+        chosen.textContent = `✓ ${item.side === 0 ? item.a : item.b}`;
+        li.append(number, pair, chosen);
+        list.appendChild(li);
+      });
+      results.classList.add('show');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
+    buttons[0].addEventListener('click', () => pick(0));
+    buttons[1].addEventListener('click', () => pick(1));
+    el('restart').addEventListener('click', start);
+    start();
+  </script>
+</body>
+</html>
