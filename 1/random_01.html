@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>랜덤 발표자 뽑기</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI","Malgun Gothic",sans-serif;color:#17253a;background:#f3f6fb}*{box-sizing:border-box}body{margin:0;padding:28px 16px}.wrap{max-width:920px;margin:auto}header{text-align:center;margin:10px 0 26px}h1{font-size:clamp(28px,5vw,40px);margin:0 0 8px}header p{color:#66758b;margin:0}.grid{display:grid;grid-template-columns:1fr 1.1fr;gap:20px}.panel{background:white;border:1px solid #e3e9f2;border-radius:22px;padding:25px;box-shadow:0 8px 28px #1d3e7610}h2{font-size:18px;margin:0 0 16px}label{display:block;font-weight:650;margin-bottom:9px}textarea{display:block;resize:vertical;width:100%;min-height:220px;border:1px solid #cbd5e1;border-radius:12px;padding:14px;font:inherit;line-height:1.7}textarea:focus{outline:3px solid #d8e6ff;border-color:#4879dc}.help,.meta{color:#64748b;font-size:13px;line-height:1.6}.controls{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.btn{border:0;background:#eaf0fa;color:#24446f;padding:11px 16px;border-radius:12px;font:inherit;font-weight:700;cursor:pointer}.btn.primary{background:#345cda;color:white}.btn.primary:hover{background:#284ac0}.btn:hover{filter:brightness(.97)}.btn:disabled{opacity:.5;cursor:not-allowed}.toggle{display:flex;gap:10px;align-items:center;font-size:14px;font-weight:500}.toggle input{width:18px;height:18px;accent-color:#345cda}.stage{text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(155deg,#f3f7ff,#edf1ff);min-height:246px;border-radius:18px;padding:18px;margin-bottom:16px}.stage .eyebrow{color:#54678a;font-size:14px;font-weight:700}.winner{font-size:clamp(27px,5vw,46px);font-weight:850;overflow-wrap:anywhere;margin:17px 0;color:#243e98;min-height:60px}.stage .sub{font-size:13px;color:#687b9d}.action-row{display:flex;gap:9px}.action-row .primary{flex:1;font-size:17px;padding:15px}.stats{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0}.stat{background:#f1f5fa;border-radius:10px;padding:7px 11px;color:#455975;font-size:13px}.history{margin:0;padding-left:22px;max-height:230px;overflow:auto}.history li{padding:8px 0;border-bottom:1px solid #edf1f7}.history li small{color:#7a8697;margin-left:8px}.empty{color:#8290a5;font-size:14px}.rowhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.rowhead h2{margin:0}.foot{text-align:center;color:#7e8ca1;font-size:12px;margin:20px 0}.notice{min-height:20px;color:#b44240;font-size:13px;margin-top:8px}@media(max-width:710px){.grid{grid-template-columns:1fr}.panel{padding:20px}textarea{min-height:155px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1>🎤 랜덤 발표자 뽑기</h1><p>누구에게나 공정한 한 번의 기회! 수업 · 회의 · 모임에서 간편하게 사용하세요.</p></header>
+<main class="grid">
+<section class="panel"><h2>👥 참가자 명단</h2><label for="names">이름 입력</label><textarea id="names" spellcheck="false" placeholder="김민지&#10;이준호&#10;박서연&#10;최도윤"></textarea><div class="help">한 줄에 한 명씩 입력하세요. 쉼표로 구분해도 됩니다. 같은 이름은 한 명으로 처리됩니다.</div><div class="controls"><button class="btn" id="sample">예시 입력</button><button class="btn" id="clear">명단 비우기</button></div><label class="toggle"><input id="noRepeat" type="checkbox" checked>한 라운드에서 중복 당첨 방지</label><p class="help">체크하면 모든 참가자가 한 번씩 뽑힐 때까지 같은 사람은 다시 나오지 않습니다.</p><div class="notice" id="notice" role="status" aria-live="polite"></div></section>
+<section class="panel"><h2>✨ 발표자 추첨</h2><div class="stage" aria-live="polite" aria-atomic="true"><span class="eyebrow" id="stageTitle">오늘의 발표자는?</span><div class="winner" id="winner">준비 완료!</div><span class="sub" id="stageSub">명단을 입력하고 추첨 버튼을 눌러주세요</span></div><div class="action-row"><button class="btn primary" id="draw">🎲 발표자 뽑기</button><button class="btn" id="reset" title="추첨 기록과 한 라운드의 당첨 내역을 초기화">↻ 초기화</button></div><div class="stats"><span class="stat" id="total">전체 0명</span><span class="stat" id="remaining">남은 인원 0명</span><span class="stat" id="count">추첨 0회</span></div><div class="rowhead"><h2>📋 추첨 기록</h2><button class="btn" id="copy" style="padding:7px 11px;font-size:12px">기록 복사</button></div><ol class="history" id="history"><li class="empty">아직 추첨 기록이 없습니다.</li></ol></section>
+</main><p class="foot">모든 추첨은 이 브라우저 안에서 진행됩니다. 참가자 명단은 서버로 전송되지 않습니다.</p>
+</div>
+<script>
+'use strict';
+const el=id=>document.getElementById(id);
+const names=el('names'), noRepeat=el('noRepeat');
+let history=[], used=new Set(), last=null, busy=false, timer=null;
+// 공백과 쉼표로 구분된 명단을 정리하고 같은 이름은 한 명으로 처리합니다.
+function people(){return [...new Set(names.value.split(/[\n,，]+/).map(s=>s.trim()).filter(Boolean))];}
+// 가능한 참가자 중 누구나 동일한 확률로 선택되도록 편향 없는 정수 난수를 생성합니다.
+function secureIndex(length){
+ if(length<1)throw new Error('추첨 대상이 없습니다.');
+ if(!globalThis.crypto?.getRandomValues)throw new Error('보안 난수를 지원하는 브라우저가 필요합니다.');
+ const range=0x100000000,limit=Math.floor(range/length)*length;
+ const b=new Uint32Array(1);let x;
+ do{crypto.getRandomValues(b);x=b[0];}while(x>=limit);
+ return x%length;
+}
+function update(){
+ const p=people(), pool=noRepeat.checked?p.filter(n=>!used.has(n)):p;
+ el('total').textContent=`전체 ${p.length}명`;
+ el('remaining').textContent=`남은 인원 ${pool.length}명`;
+ el('count').textContent=`추첨 ${history.length}회`;
+ el('draw').disabled=busy||p.length===0;
+ el('draw').textContent=busy?'🎲 추첨 중…':(noRepeat.checked&&p.length&&pool.length===0?'🔄 새 라운드 시작':'🎲 발표자 뽑기');
+ const list=el('history');list.replaceChildren();
+ if(!history.length){const li=document.createElement('li');li.className='empty';li.textContent='아직 추첨 기록이 없습니다.';list.append(li);}
+ else [...history].reverse().forEach(h=>{const li=document.createElement('li');li.textContent=`${h.name} `;const sm=document.createElement('small');sm.textContent=`${h.time}`;li.append(sm);list.append(li);});
+}
+function stop(){if(timer!==null)clearInterval(timer);timer=null;busy=false;}
+function reset(message='추첨 내역을 초기화했습니다.'){stop();used.clear();history=[];last=null;el('winner').textContent='준비 완료!';el('stageTitle').textContent='오늘의 발표자는?';el('stageSub').textContent='명단을 입력하고 추첨 버튼을 눌러주세요';el('notice').textContent=message;update();}
+function draw(){
+ if(busy)return;
+ const p=people();if(!p.length){el('notice').textContent='먼저 참가자 이름을 입력해 주세요.';return;}
+ if(noRepeat.checked&&p.every(n=>used.has(n))){used.clear();el('notice').textContent='모든 사람이 뽑혀 새 라운드를 시작했습니다.';}
+ else el('notice').textContent='';
+ const pool=noRepeat.checked?p.filter(n=>!used.has(n)):p;
+ const chosen=pool[secureIndex(pool.length)]; // 애니메이션보다 먼저 최종 결과를 공정하게 결정합니다.
+ busy=true;update();el('stageTitle').textContent='두근두근…';el('stageSub').textContent='발표자를 고르는 중입니다';
+ let ticks=0;
+ timer=setInterval(()=>{
+  el('winner').textContent=pool[secureIndex(pool.length)];
+  if(++ticks>=15){stop();last=chosen;used.add(chosen);history.push({name:chosen,time:new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})});el('stageTitle').textContent='🎉 발표자로 선정되었습니다!';el('winner').textContent=chosen;el('stageSub').textContent='축하합니다! 발표를 시작해 주세요.';update();}
+ },65);
+}
+el('draw').addEventListener('click',draw);
+el('reset').addEventListener('click',()=>reset());
+el('sample').addEventListener('click',()=>{names.value='김민지\n이준호\n박서연\n최도윤\n정하린\n오지훈\n한서아\n윤지민';reset('예시 명단을 입력했습니다.');});
+el('clear').addEventListener('click',()=>{names.value='';reset('명단을 비웠습니다.');names.focus();});
+// 참가자 명단 변경 시 이전 라운드 기록을 지워 서로 다른 명단이 섞이지 않게 합니다.
+names.addEventListener('input',()=>reset('명단이 변경되어 추첨 기록을 초기화했습니다.'));
+noRepeat.addEventListener('change',()=>reset('추첨 방식을 변경하여 기록을 초기화했습니다.'));
+el('copy').addEventListener('click',async()=>{if(!history.length){el('notice').textContent='복사할 추첨 기록이 없습니다.';return;}let txt=history.map((h,i)=>`${i+1}. ${h.name} (${h.time})`).join('\n');try{await navigator.clipboard.writeText(txt);el('notice').textContent='추첨 기록을 복사했습니다.';}catch{el('notice').textContent='클립보드 접근이 제한되었습니다. 기록을 직접 선택하여 복사해 주세요.';}});
+update();
+</script>
+</body>
+</html>
