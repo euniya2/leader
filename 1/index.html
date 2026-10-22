@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>바이브코딩 &amp; Apps Script · 실습 가이드</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232f6feb'/><text x='16' y='22' font-size='15' font-weight='700' text-anchor='middle' fill='white' font-family='monospace'>&lt;/&gt;</text></svg>">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='8'%20fill='%232f6feb'/%3E%3Ctext%20x='16'%20y='23'%20font-size='19'%20font-weight='700'%20text-anchor='middle'%20fill='white'%20font-family='Arial%2Csans-serif'%3EJ%3C/text%3E%3C/svg%3E">
 <style>
   :root{
     --bg:#f6f7f9; --card:#fff; --line:#e3e6ea; --text:#1c2024; --sub:#6b7280;
@@ -37,7 +37,21 @@
   .guide ol{margin:8px 0 0; padding-left:20px}
   .guide li{margin:2px 0}
 
-  nav{display:flex; flex-wrap:wrap; gap:6px; margin:14px 0 0}
+  nav{display:flex; flex-wrap:wrap; gap:6px; margin:14px 0 0; align-items:center}
+
+  /* 실습 중에 쓰는 도구 바로가기 */
+  .tools{margin-left:auto; display:flex; flex-wrap:wrap; gap:6px}
+  .tool-ico{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:36px; height:36px; border-radius:10px; overflow:hidden;
+    border:1px solid var(--line); background:#fff;
+    text-decoration:none; color:var(--sub);
+    font-size:11px; font-weight:700; line-height:1;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .tool-ico:hover{border-color:var(--accent); box-shadow:0 2px 8px rgba(47,111,235,.14)}
+  .tool-ico img{width:20px; height:20px; display:block}
+  @media (max-width:760px){ .tools{margin-left:0; margin-top:6px} }
   nav button{
     border:1px solid var(--line); background:var(--card); color:var(--sub);
     padding:9px 15px; border-radius:999px; font-size:14px; cursor:pointer;
@@ -45,6 +59,20 @@
   }
   nav button:hover{border-color:#b9c2cc}
   nav button.on{background:var(--accent); border-color:var(--accent); color:#fff}
+
+  /* 실습 주제 하위 메뉴 — 실습 주제 탭에서만 보입니다 */
+  .subnav{display:none; flex-wrap:wrap; gap:5px; margin:9px 0 0}
+  .subnav.on{display:flex}
+  .subnav button{
+    border:1px solid #e2e9f4; background:#f5f8fd; color:#5b6b86;
+    padding:6px 12px; border-radius:8px; font-size:13px; cursor:pointer;
+    font-family:inherit; font-weight:600;
+  }
+  .subnav button:hover{border-color:var(--accent); color:var(--accent)}
+  .subnav button.on{background:var(--accent-soft); border-color:#b9d0ff; color:#1b3f8f}
+  .subnav .label{
+    align-self:center; font-size:12px; color:var(--sub); margin-right:4px; font-weight:600;
+  }
 
   section{display:none}
   section.on{display:block}
@@ -107,6 +135,7 @@
   .prompt-view .tag{
     display:inline-block; font-weight:800; color:var(--accent);
     background:var(--accent-soft); border-radius:5px; padding:1px 7px;
+    margin-left:-7px;
   }
 
   /* 프롬프트 펼치기 버튼 */
@@ -233,7 +262,25 @@
     <button data-t="s3">내 주제로</button>
     <button data-t="s4">투표 플랫폼</button>
     <button data-t="s5">이메일 자동비서</button>
+    <div class="tools">
+      <a class="tool-ico" href="https://gemini.google.com" target="_blank" rel="noopener" title="Gemini">
+        <img src="https://www.gstatic.com/images/branding/product/1x/gemini_48dp.png" alt="제미나이" width="20" height="20"></a>
+      <a class="tool-ico" href="https://chatgpt.com" target="_blank" rel="noopener" title="ChatGPT">
+        <img src="https://www.google.com/s2/favicons?domain=chatgpt.com&amp;sz=64" alt="GPT" width="20" height="20"></a>
+      <a class="tool-ico" href="https://sheets.google.com" target="_blank" rel="noopener" title="구글 시트">
+        <img src="https://www.gstatic.com/images/branding/product/1x/sheets_2020q4_48dp.png" alt="시트" width="20" height="20"></a>
+      <a class="tool-ico" href="https://forms.google.com" target="_blank" rel="noopener" title="구글 폼">
+        <img src="https://www.gstatic.com/images/branding/product/1x/forms_2020q4_48dp.png" alt="폼" width="20" height="20"></a>
+    </div>
   </nav>
+
+  <div class="subnav" id="subnav">
+    <span class="label">주제로 이동</span>
+    <button data-go="t1">1 타이머</button>
+    <button data-go="t2">2 진단 테스트</button>
+    <button data-go="t3">3 밸런스 게임</button>
+    <button data-go="t4">4 프로필 카드</button>
+  </div>
 </div>
 
 
@@ -520,7 +567,7 @@
   </div>
 
   <!-- 주제 1 -->
-  <div class="card">
+  <div class="card" id="t1">
     <div class="card-head">
       <div class="ico">1</div>
       <div class="ttl">
@@ -580,7 +627,7 @@ ESC 키를 누르면 원래대로 돌아와.</textarea>
   </div>
 
   <!-- 주제 2 -->
-  <div class="card">
+  <div class="card" id="t2">
     <div class="card-head">
       <div class="ico">2</div>
       <div class="ttl">
@@ -645,7 +692,7 @@ ESC 키를 누르면 원래대로 돌아와.</textarea>
   </div>
 
   <!-- 주제 3 -->
-  <div class="card">
+  <div class="card" id="t3">
     <div class="card-head">
       <div class="ico">3</div>
       <div class="ttl">
@@ -709,7 +756,7 @@ ESC 키를 누르면 원래대로 돌아와.</textarea>
   </div>
 
   <!-- 주제 4 -->
-  <div class="card">
+  <div class="card" id="t4">
     <div class="card-head">
       <div class="ico">4</div>
       <div class="ttl">
@@ -798,6 +845,28 @@ ESC 키를 누르면 원래대로 돌아와.</textarea>
       </div>
     </div>
 
+    <p class="check-title">무엇을 만들지 떠오르지 않는다면</p>
+    <p style="font-size:13.5px; color:var(--sub); margin:6px 0 0">
+      주제부터 AI에게 추천받으세요. <b>반복해서 하는 일인가, 화면 하나로 끝나는가</b>로 고르면 됩니다.
+    </p>
+
+    <div class="blk">
+      <div class="blk-head"><h3>주제 추천받기</h3><button class="copy">복사</button></div>
+      <textarea class="short" readonly style="height:80px">나는 ○○ 업무를 하고 있어.
+내가 반복해서 하는 일 중 간단한 웹앱으로 만들면 편리할 만한 것을
+5개 추천해줘.</textarea>
+    </div>
+
+    <div class="idea">
+      <b>이런 것들이 나옵니다.</b>
+      회의 안건 정리판 · 비품 점검표 · 만족도 즉석 집계 · 신청 접수 관리
+      <p style="margin:8px 0 0">
+        꼭 업무가 아니어도 됩니다. <b>집안일 체크, 독서 기록도 방법은 같습니다.</b>
+      </p>
+    </div>
+
+    <p class="check-title">주제를 정했다면, 이 양식에 채워 넣으세요</p>
+
     <div class="blk">
       <div class="blk-head"><h3>양식</h3><button class="copy">복사</button></div>
       <pre class="prompt-view"><span class="tag">[역할 부여]</span>
@@ -865,6 +934,9 @@ ESC 키를 누르면 원래대로 돌아와.</textarea>
       </div>
     </div>
 
+    <div class="demo-right">
+      <a class="demo" href="https://script.google.com/macros/s/AKfycbwpXfgoxYpx9wVnHLy2fHxEKrGWXJbgbPCqM7_g-eswTlOn7VBXL6jC3VuVrhS4SV4MQA/exec" target="_blank" rel="noopener">투표 페이지 열기</a>
+    </div>
     <table>
       <tr><th style="width:70px">단계</th><th>하는 일</th><th style="width:40%">완료 체크</th></tr>
       <tr><td>1</td><td>구글 시트 만들기 — 탭 이름 <b>RawData</b></td><td>1행에 <b>타임스탬프 · 투표항목</b> 머리글이 있음</td></tr>
@@ -874,9 +946,6 @@ ESC 키를 누르면 원래대로 돌아와.</textarea>
       <tr><td>5</td><td>주소를 열어 투표해보기</td><td>시트에 줄이 늘고 화면에 그래프가 그려짐</td></tr>
     </table>
 
-    <div class="demo-right">
-      <a class="demo" href="https://script.google.com/macros/s/AKfycbwpXfgoxYpx9wVnHLy2fHxEKrGWXJbgbPCqM7_g-eswTlOn7VBXL6jC3VuVrhS4SV4MQA/exec" target="_blank" rel="noopener">투표 페이지 열기</a>
-    </div>
 
     <div class="blk">
       <div class="blk-head"><h3>프롬프트</h3><button class="copy">복사</button></div>
@@ -917,29 +986,29 @@ setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)을 넣어 줘.
     <table>
       <tr><th style="width:24%">프롬프트</th><th style="width:40%">하는 일</th><th>없다면?</th></tr>
       <tr>
-        <td><b>doGet</b></td>
+        <td><b>doGet</b><br><span style="font-size:11.5px; color:var(--sub)">생성 함수 · 이름 고정</span></td>
         <td>웹앱 접속 시 화면 띄우기</td>
         <td>화면이 보이지 않음</td>
       </tr>
       <tr>
-        <td><b>google.script.run</b></td>
+        <td><b>google.script.run</b><br><span style="font-size:11.5px; color:var(--sub)">기본 기능</span></td>
         <td>서버 함수를 이름으로 직접 호출 (웹앱 주소 필요 X)</td>
         <td>웹앱 주소 호출이 꼬일 수 있음</td>
       </tr>
       <tr>
-        <td><b>appendRow</b></td>
+        <td><b>appendRow</b><br><span style="font-size:11.5px; color:var(--sub)">기본 함수</span></td>
         <td>입력 데이터의 끝에 한 줄씩 추가</td>
         <td>여러 명 동시 입력 시 덮어쓰기</td>
       </tr>
       <tr>
-        <td><b>getResults</b></td>
+        <td><b>getResults</b><br><span style="font-size:11.5px; color:var(--sub)">생성 함수</span></td>
         <td>시트를 읽어 항목별 집계 후 화면에 전달</td>
         <td>시트 수식에 오타가 나면 0으로만 표시</td>
       </tr>
       <tr>
-        <td><b>ALLOWALL</b></td>
-        <td>다른 사이트에 끼워 넣기 허용</td>
-        <td>교안에 넣으면 빈칸으로 표시</td>
+        <td><b>ALLOWALL</b><br><span style="font-size:11.5px; color:var(--sub)">설정</span></td>
+        <td>만든 화면을 다른 페이지 안에 넣어서 보여줄 수 있게 허용</td>
+        <td>블로그 같은 다른 페이지에 넣으면 빈칸으로 표시</td>
       </tr>
     </table>
 
@@ -1006,7 +1075,8 @@ setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)을 넣어 줘.
     </div><textarea class="short" readonly style="height:110px">[확인 공식 1]  구글 시트 탭 이름          ===  코드의 getSheetByName('RawData')
 [확인 공식 2]  왼쪽 파일 목록의 이름       ===  코드 안 따옴표 속 이름 (대소문자까지)
 [확인 공식 3]  google.script.run.함수이름  ===  코드.gs에 있는 함수 이름
-[확인 공식 4]  배포의 액세스 권한          ===  모든 사용자</textarea>
+[확인 공식 4]  배포의 액세스 권한          ===  모든 사용자
+[확인 공식 5]  코드를 고친 뒤             ===  배포 관리에서 기존 배포 수정 (새 배포 아님)</textarea>
 
     <table>
       <tr><th style="width:42%">증상</th><th>원인과 조치</th></tr>
@@ -1014,8 +1084,8 @@ setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)을 넣어 줘.
       <tr><td>나만 되고 남은 못 들어옴</td><td>액세스 권한이 &lsquo;나만&rsquo; — 확인 공식 4. 고친 뒤 <b>새 배포</b>로 다시</td></tr>
       <tr><td>투표는 되는데 시트에 안 쌓임</td><td>탭 이름 불일치 — 확인 공식 1</td></tr>
       <tr><td>투표는 되는데 그래프에 안 잡힘</td><td>항목 이름 불일치. <b>코드.gs의 VOTE_OPTIONS 와 Index.html의 value 가 같아야 합니다</b></td></tr>
-      <tr><td>맨 처음 한 표가 안 보임</td><td>RawData 1행에 머리글이 없음</td></tr>
-      <tr><td>코드를 고쳤는데 화면이 그대로</td><td>배포 → 새 배포로 다시</td></tr>
+      <tr><td>코드를 고쳤는데 화면이 그대로</td><td><b>배포 → 배포 관리 → 수정(연필) → 버전을 &lsquo;새 버전&rsquo;으로 → 배포.</b> 이렇게 해야 주소가 유지됩니다.<br>그래도 안 바뀌면 <b>&lsquo;새 배포&rsquo;</b>를 하세요. 이때는 <b>주소가 바뀌므로 다시 공유</b>해야 합니다</td></tr>
+      <tr><td>공유한 주소를 남이 못 엶</td><td><b>&lsquo;새 배포&rsquo;를 눌러 주소가 바뀐 것입니다.</b> 고칠 때는 위처럼 기존 배포를 수정하세요 — 확인 공식 5</td></tr>
     </table>
   </div>
 
@@ -1498,7 +1568,39 @@ function getResults() {
       <div class="ttl">
         <h2>미션</h2>
       </div>
-    </div><p style="font-size:14px; margin:0 0 4px"><span class="mission-num">1</span><b>내 주제로 바꾸기</b></p>
+    </div><p style="font-size:14px; margin:0 0 4px"><span class="mission-num">1</span><b>투표하면 메일 보내기</b></p>
+    <p class="goal">투표한 사람에게 본인이 고른 항목과 현재 집계를 메일로 보내줍니다.</p>
+    <div class="blk">
+      <div class="blk-head"><h3>프롬프트</h3><button class="copy">복사</button></div>
+      <textarea class="prompt" readonly style="height:270px">투표 화면에 이메일 입력 칸을 추가해 줘.
+입력은 선택 사항으로 하고, 적은 사람에게만 메일을 보내 줘.
+
+RawData 시트의 첫 줄을 타임스탬프 · 투표항목 · 이메일 세 칸으로 바꿔 줘.
+
+투표가 저장된 뒤에 그 사람에게 확인 메일을 보내 줘.
+제목은 '[투표 완료] ○○를 선택하셨습니다' 형태로 하고,
+본문에는 본인이 고른 항목과 지금까지의 집계 결과가 들어가게 해 줘.
+집계는 항목별 득표수와 비율을 모두 넣어 줘.
+
+메일 발송이 실패해도 투표는 반드시 시트에 저장되게 해 주고,
+실패하면 화면에 오류 내용을 그대로 보여 줘.
+
+메일 발송은 MailApp을 사용해 줘.
+그리고 메일 권한을 미리 승인받을 수 있도록, 편집기에서 직접 실행하는
+'권한승인' 함수를 하나 만들어 줘. 실행하면 남은 메일 한도를
+로그에 남기게 해 줘.</textarea>
+    </div>
+
+    <div class="note">
+      <b>코드를 붙여넣은 뒤, 편집기에서 &lsquo;권한승인&rsquo; 함수를 한 번 실행하세요.</b>
+      함수 목록에서 고르고 실행을 누르면 승인 창이 뜹니다. 허용하면 됩니다.<br>
+      이 단계를 건너뛰면 <b>투표는 저장되는데 메일만 조용히 안 갑니다.</b>
+      메일 기능이 없던 코드에 새로 붙였기 때문에 다시 승인이 필요합니다.
+    </div>
+
+    <div class="done-mark"><b>완료 체크</b> — 투표한 뒤 내 메일함에 선택 항목과 집계가 담긴 메일이 도착</div>
+
+    <p style="font-size:14px; margin:26px 0 4px"><span class="mission-num">2</span><b>내 주제로 바꾸기</b></p>
     <p class="goal">회식 메뉴 / 다음 모임 날짜 / 우리 팀이 쓰는 협업툴 / 배우고 싶은 주제</p>
 
     <div class="idea">
@@ -1514,7 +1616,7 @@ function getResults() {
       <p style="margin:12px 0 0"><b>본인만의 웹앱을 제작하고 기능을 추가해보세요.</b></p>
     </div>
 
-    <p style="font-size:14px; margin:26px 0 4px"><span class="mission-num">2</span><b>서로 공유하고 투표해주기</b></p>
+    <p style="font-size:14px; margin:26px 0 4px"><span class="mission-num">3</span><b>서로 공유하고 투표해주기</b></p>
     <p class="goal">만든 웹앱 주소를 공유하고, 서로의 주소에 들어가 투표해주세요.</p>
     <div class="done-mark"><b>완료 체크</b> — 구글 시트에 DB가 쌓이는지 확인해보세요</div>
   </div>
@@ -1534,6 +1636,9 @@ function getResults() {
       </div>
     </div>
 
+    <div class="demo-right">
+      <a class="demo" href="https://docs.google.com/forms/d/e/1FAIpQLSfTt3dQ-eCrqe97_9wXCVw1RsEIsZwk4wRYFy-Ljdv-fXnv-A/viewform" target="_blank" rel="noopener">자료 신청 폼 열기</a>
+    </div>
     <table>
       <tr><th style="width:70px">단계</th><th>하는 일</th><th style="width:40%">완료 체크</th></tr>
       <tr><td>1</td><td>구글 폼 만들기 (이름 · 이메일 문항)</td><td>응답 시트가 만들어짐</td></tr>
@@ -1541,15 +1646,20 @@ function getResults() {
       <tr><td>3</td><td>프롬프트로 코드 생성 후 붙여넣기</td><td>파일 목록에 <b>코드.gs</b>와 <b>email.html</b></td></tr>
       <tr><td>4</td><td>맨 위 설정값 채우기</td><td>이름 열 · 이메일 열 · 다운로드 링크가 채워짐</td></tr>
       <tr><td>5</td><td><b>트리거 설정</b> — 시계 아이콘 → 트리거 추가</td><td>이벤트 유형 <b>양식 제출 시</b>, 함수 <b>onFormSubmit</b></td></tr>
-      <tr><td>6</td><td>폼을 실제로 제출해보기</td><td>메일함에 자료 메일이 도착</td></tr>
+      <tr><td>6</td><td>폼을 실제로 제출해보기</td><td>실행 기록에 <b>메일 발송 성공</b> 로그가 찍힘</td></tr>
     </table>
 
-    <div class="demo-right">
-      <a class="demo" href="https://docs.google.com/forms/d/e/1FAIpQLSfTt3dQ-eCrqe97_9wXCVw1RsEIsZwk4wRYFy-Ljdv-fXnv-A/viewform" target="_blank" rel="noopener">교안 신청 폼 열기</a>
-    </div>
 
     <div class="note">
       <b>이번 실습은 구글폼으로 제출할 때만 동작합니다.</b>
+    </div>
+
+    <div class="note">
+      <b>구글폼 제출 후 첫 메일은 전송되는 데 시간이 걸릴 수 있습니다.</b>
+      바로 오는 경우도 있고, 10~15분 걸리기도 합니다.
+      <b>한 번 도착한 뒤부터는 바로 옵니다.</b><br>
+      코드가 완성되면 일단 한 번 제출해두고 다음으로 넘어가세요.
+      실행 기록에 <b>메일 발송 성공</b>이 찍혔다면 할 일은 끝난 것입니다.
     </div>
 
     <div class="blk">
@@ -1560,11 +1670,11 @@ function getResults() {
 구글 폼 제출 이벤트 객체의 e.values를 사용하여 동시성 오류(getLastRow 이슈)를
 원천 차단하고, 폼 응답 시트('설문지 응답')의 두 번째 열(이름)과
 세 번째 열(이메일) 데이터를 안전하게 읽어와
-'[이름]님, 요청하신 수업 교안 자료가 도착했습니다.'라는 제목의
+'[이름]님, 요청하신 자료가 도착했습니다.'라는 제목의
 반응형 이메일을 실시간 발송하는 Code.gs와 email.html 코드를 작성해 줘.
 
 email.html은 모바일 화면에 최적화되고, 파스텔톤 블루 테마에
-중앙의 '교안 다운로드' 버튼이 크게 강조된
+중앙의 '자료 다운로드' 버튼이 크게 강조된
 전문 교육 자료 배포용 스타일로 구성해 줘.
 
 [설정 규칙 — 이대로 지켜줘]
@@ -1582,7 +1692,7 @@ email.html은 모바일 화면에 최적화되고, 파스텔톤 블루 테마에
 
 - 코드 맨 위에 아래 값들을 상수로 몰아서 눈에 띄게 표시해 줘.
   이 부분만 고치면 되도록.
-    시트 이름, 이름이 있는 열 번호, 이메일이 있는 열 번호, 교안 다운로드 링크
+  시트 이름, 이름이 있는 열 번호, 이메일이 있는 열 번호, 자료 다운로드 링크
 
 - 메일 발송이 실패하면 try/catch로 잡아서 무엇이 실패했는지 로그에 남겨 줘.
 
@@ -1590,6 +1700,37 @@ email.html은 모바일 화면에 최적화되고, 파스텔톤 블루 테마에
 스크립트 등록, 트리거 설정, 테스트까지 전체 과정을
 단계별 가이드로 자세히 작성해 줘.</textarea>
     </div>
+
+    <p class="check-title">아래 다섯 가지는 빼면 실제로 동작하지 않거나, 조용히 잘못 돌아가는 것들입니다.</p>
+
+    <table>
+      <tr><th style="width:26%">프롬프트</th><th style="width:38%">하는 일</th><th>없다면?</th></tr>
+      <tr>
+        <td><b>onFormSubmit</b><br><span style="font-size:11.5px; color:var(--sub)">생성 함수</span></td>
+        <td>폼이 제출될 때 실행할 함수 (이름은 우리가 정한 것)</td>
+        <td>트리거에서 고를 함수가 여러 개라 헷갈림</td>
+      </tr>
+      <tr>
+        <td><b>설치형 트리거</b><br><span style="font-size:11.5px; color:var(--sub)">설정</span></td>
+        <td>내 권한으로 실행되도록 직접 등록</td>
+        <td>실행은 되는데 메일만 안 감</td>
+      </tr>
+      <tr>
+        <td><b>e.values</b><br><span style="font-size:11.5px; color:var(--sub)">전달 값</span></td>
+        <td>폼이 건네준 값을 그대로 받음 (시트를 읽지 않음)</td>
+        <td>동시 제출 시 엉뚱한 사람에게 발송</td>
+      </tr>
+      <tr>
+        <td><b>createTemplateFromFile</b><br><span style="font-size:11.5px; color:var(--sub)">기본 함수</span></td>
+        <td>email.html 에 이름과 링크를 끼워 넣음</td>
+        <td>디자인 없는 맨 글씨 메일</td>
+      </tr>
+      <tr>
+        <td><b>try / catch</b><br><span style="font-size:11.5px; color:var(--sub)">기본 문법</span></td>
+        <td>실패해도 멈추지 않고 기록을 남김</td>
+        <td>한 번 실패하면 그 뒤가 전부 중단</td>
+      </tr>
+    </table>
   </div>
 
   <div class="card">
@@ -1603,8 +1744,8 @@ email.html은 모바일 화면에 최적화되고, 파스텔톤 블루 테마에
 
     <table>
       <tr><th style="width:42%">증상</th><th>원인과 조치</th></tr>
-      <tr><td>폼을 냈는데 메일이 안 옴</td><td><b>먼저 스팸함을 확인하세요.</b> 처음 받는 발신자에 링크가 들어 있으면 걸러질 수 있습니다</td></tr>
-      <tr><td>스팸함에도 없음</td><td>Apps Script 왼쪽 <b>「실행」 탭</b>을 여세요. 제출 시각마다 기록이 찍혀 있다면 <b>배달 지연입니다. 기다리면 옵니다.</b> 코드를 고치지 마세요</td></tr>
+      <tr><td>폼을 냈는데 메일이 안 옴</td><td><b>스팸함과 프로모션 탭을 먼저 확인하세요.</b> 링크가 든 자동 발송 메일은 그쪽으로 분류되기도 합니다</td></tr>
+      <tr><td>거기에도 없음</td><td>Apps Script 왼쪽 <b>「실행」 탭</b>을 여세요. 기록에 <b>메일 발송 성공</b>이 찍혀 있다면 보낸 것입니다. <b>기다리면 옵니다.</b> 특히 첫 메일은 시간이 걸릴 수 있습니다. 코드를 고치지 마세요</td></tr>
       <tr><td>실행 기록 자체가 없음</td><td><b>트리거 미설정. 가장 흔합니다</b> — 확인 공식 1·2</td></tr>
       <tr><td>&ldquo;이벤트 객체가 유효하지 않습니다&rdquo;</td><td><b>정상입니다.</b> 수동 실행으로는 테스트가 안 됩니다. 폼을 실제로 제출하세요</td></tr>
       <tr><td>&ldquo;email 파일을 찾을 수 없습니다&rdquo;</td><td>파일 이름 대소문자 불일치 — 확인 공식 3</td></tr>
@@ -1631,7 +1772,7 @@ const SHEET_NAME = '설문지 응답';
 
 const NAME_COLUMN    = 2;                      // 이름 열 번호 (B열 = 2)
 const EMAIL_COLUMN   = 3;                      // 이메일 열 번호 (C열 = 3)
-const DOWNLOAD_LINK  = '교안링크를 넣어주세요';   // 교안 다운로드 링크
+const DOWNLOAD_LINK  = '자료 링크를 넣어주세요';   // 자료 다운로드 링크
 
 
 /******************************************************
@@ -1664,7 +1805,7 @@ function onFormSubmit(e) {
     const htmlBody = template.evaluate().getContent();
 
     // ▶ 메일 제목
-    const subject = `${name}님, 요청하신 수업 교안 자료가 도착했습니다.`;
+    const subject = `${name}님, 요청하신 자료가 도착했습니다.`;
 
     // ▶ 메일 발송
     GmailApp.sendEmail(email, subject, '', {
@@ -1751,17 +1892,17 @@ function onFormSubmit(e) {
   &lt;div class="container">
 
     &lt;div class="header">
-      &amp;#128216; 수업 교안 자료 안내
+      &amp;#128216; 자료 안내
     &lt;/div>
 
     &lt;div class="content">
       &lt;p>&lt;strong>&lt;?= name ?>&lt;/strong>님,&lt;/p>
-      &lt;p>요청하신 수업 교안 자료가 준비되었습니다.&lt;/p>
+      &lt;p>요청하신 자료가 준비되었습니다.&lt;/p>
       &lt;p>아래 버튼을 클릭하여 바로 다운로드하실 수 있습니다.&lt;/p>
     &lt;/div>
 
     &lt;a href="&lt;?= downloadLink ?>" class="button">
-      교안 다운로드
+      자료 다운로드
     &lt;/a>
 
     &lt;div class="footer">
@@ -1776,24 +1917,317 @@ function onFormSubmit(e) {
     </div>
   </details>
 
+  <div class="card">
+    <div class="card-head">
+      <div class="ttl">
+        <h2>미션</h2>
+      </div>
+    </div><p style="font-size:14px; margin:0 0 4px"><span class="mission-num">1</span><b>참여한 강의에 따라 다른 자료 보내기</b></p>
+    <p class="goal">행사가 끝난 뒤, 각자 들은 강의에 맞는 자료를 받게 합니다.</p>
+
+    <div class="note">
+      <b>먼저 구글 폼에 선택 문항을 하나 추가하세요.</b>
+      항목 이름은 &lsquo;참여한 강의&rsquo;, 선택지는 &lsquo;데이터분석&rsquo; 과 &lsquo;바이브코딩&rsquo; 입니다.<br>
+      <b>반드시 맨 마지막 문항으로 추가하세요.</b>
+      중간에 끼워 넣으면 이름과 이메일 열이 한 칸씩 밀려서 멀쩡하던 코드가 깨집니다.
+    </div>
+
+    <div class="blk">
+      <div class="blk-head"><h3>프롬프트</h3><button class="copy">복사</button></div>
+      <textarea class="short" readonly style="height:170px">구글 폼에 '참여한 강의' 선택 문항을 맨 마지막에 추가했어.
+선택지는 '데이터분석' 과 '바이브코딩' 두 가지야.
+
+선택한 강의에 따라 서로 다른 자료 링크가 메일에 담기게 해 줘.
+'데이터분석' 을 고르면 A 링크, '바이브코딩' 을 고르면 B 링크가 가도록.
+어느 쪽도 아니면 기본 링크를 보내 줘.
+
+선택지별 링크는 코드 맨 위에 상수로 몰아서 표시해 줘.
+나중에 선택지를 늘릴 때 그 부분만 고치면 되도록.</textarea>
+    </div>
+
+    <div class="done-mark"><b>완료 체크</b> &mdash; 서로 다른 강의를 골라 두 번 제출했을 때 각각 다른 링크가 도착</div>
+
+    <div class="note">
+      <b>&lsquo;어느 쪽도 아니면 기본 링크&rsquo; 를 꼭 넣으세요.</b>
+      선택을 안 했거나 글자가 조금만 달라도 어느 조건에도 안 걸려서, 메일이 아예 안 가는 일이 생깁니다.
+    </div>
+  </div>
+
+
+  <div class="card">
+    <div class="card-head">
+      <div class="ttl">
+        <h2>과제 · 나만의 GAS 웹앱 만들기</h2>
+        <p class="goal">오늘 만든 투표 플랫폼을 바탕으로, 본인에게 필요한 웹앱을 하나 만들어보세요.</p>
+      </div>
+    </div>
+
+    <p class="check-title">이 셋이 맞으면 됩니다</p>
+    <ul class="check">
+      <li>여러 사람이 각자 들어와서 쓰는가</li>
+      <li>기록이 남아야 하는가</li>
+      <li>화면 하나로 끝나는가</li>
+    </ul>
+
+    <div class="idea">
+      <b>이런 것들이 있습니다.</b>
+      신청 접수 &middot; 출석 체크 &middot; 의견 수집 &middot; 일정 조율 &middot; 예약 시스템
+      <p style="margin:8px 0 0">
+        꼭 업무가 아니어도 됩니다. <b>가족이나 친구끼리 쓸 것도 좋습니다.</b>
+        주말 계획 정하기, 저녁 메뉴 투표처럼요.
+      </p>
+    </div>
+
+    <div class="done-mark">
+      <b>제출</b> &mdash; 만든 웹앱 주소(<b>/exec</b> 로 끝나는 주소)를 과제 시트에 공유해주세요
+    </div>
+
+    <div class="demo-right" style="margin-top:12px">
+      <a class="demo" href="https://docs.google.com/spreadsheets/d/1060CEJPgxiyVCMrjygskvqu6M0PUs3dEH6Alxkm50FY/edit" target="_blank" rel="noopener">과제 시트 열기</a>
+    </div>
+  </div>
+
+
 </section>
 
 
-<footer>AI 시민리더 강사 양성과정 · 바이브코딩 실습 가이드</footer>
+<!-- ================= 숨은 실습 · 오늘의 책상 ================= -->
+<section id="s9">
+
+  <div class="card">
+    <div class="card-head">
+      <div class="ttl">
+        <h2>오늘의 책상 · 내 PC에서만 도는 도구함</h2>
+        <p class="goal">파일을 밖으로 보내지 않고 내 컴퓨터 안에서만 처리하는 도구를 만듭니다.</p>
+      </div>
+    </div>
+
+    <div class="idea">
+      <b>찾으셨네요.</b> 여기는 시간이 남을 때 해보는 자리입니다.
+      안 하셔도 오늘 배운 것에는 아무 영향이 없습니다.
+    </div>
+
+    <p class="check-title">무엇을 만드나</p>
+    <p style="font-size:13.5px; color:var(--sub); margin:6px 0 0">
+      첫 화면은 <b>오늘 할 일 메모</b>이고, 아래 서랍을 펼치면 파일 도구가 나옵니다.
+      무료 변환 사이트에 서류를 올리는 대신, <b>이 컴퓨터 안에서 계산이 끝납니다.</b>
+    </p>
+
+    <div class="demo-right" style="margin-top:12px">
+      <a class="demo" href="https://euniya2.github.io/leader/1/desk.html" target="_blank" rel="noopener">완성된 도구함 보기</a>
+    </div>
+
+    <div class="note">
+      완성본에는 도구가 12개 들어 있지만, <b>여러분이 만들 건 그중 하나</b>입니다.
+      마음에 들면 2차 프롬프트로 하나 더 얹으면 됩니다.
+    </div>
+
+    <p class="check-title">만들 도구 하나 고르기</p>
+    <p style="font-size:13.5px; color:var(--sub); margin:6px 0 0">
+      넷 중 하나를 골라 복사하세요. 모두 브라우저 기본 기능만 써서 한 번에 나올 확률이 높습니다.
+    </p>
+
+    <div class="blk">
+      <div class="blk-head"><h3>① 사진에 날짜 · 문구 넣기</h3><button class="copy">복사</button></div>
+      <textarea class="short" readonly style="height:150px">[블록] 사진에 문구 넣기
+분류: 이미지
+한 줄 설명: 활동 사진 구석에 날짜나 행사명을 넣어 증빙용으로 만듭니다.
+입력: 이미지 여러 장 (드래그 또는 선택)
+출력: 문구가 들어간 사진 미리보기 + 저장 버튼
+설정: 문구, 위치(네 모서리 중 선택), 글자 크기, 흰색/검은색
+처리 방식: 캔버스에 이미지를 그린 뒤 그 위에 글자를 그립니다
+재처리: 설정을 바꾸면 고른 파일로 결과를 다시 만듭니다
+외부 통신: 없음</textarea>
+    </div>
+
+    <div class="blk">
+      <div class="blk-head"><h3>② 정사각형 여백 만들기</h3><button class="copy">복사</button></div>
+      <textarea class="short" readonly style="height:150px">[블록] 정사각형 맞추기
+분류: 이미지
+한 줄 설명: 홈페이지나 SNS 규격에 맞게 사진 둘레에 흰 여백을 넣어 정사각형으로 만듭니다.
+입력: 이미지 여러 장
+출력: 정사각형이 된 이미지 미리보기 + 저장 버튼
+설정: 배경색(흰색/검은색), 둘레 여백 0~80px
+처리 방식: 긴 변 기준 정사각 캔버스를 만들고 가운데에 그립니다
+재처리: 설정을 바꾸면 고른 파일로 결과를 다시 만듭니다
+외부 통신: 없음</textarea>
+    </div>
+
+    <div class="blk">
+      <div class="blk-head"><h3>③ 흑백 · 밝기 보정</h3><button class="copy">복사</button></div>
+      <textarea class="short" readonly style="height:135px">[블록] 스캔 사진 다듬기
+분류: 이미지
+한 줄 설명: 어둡게 찍힌 서류 사진을 밝게 하거나 흑백으로 바꿉니다.
+입력: 이미지 여러 장
+출력: 보정된 이미지 미리보기 + 저장 버튼
+설정: 밝기 -50~+50, 대비 -50~+50, 흑백 켜기/끄기
+재처리: 설정을 바꾸면 고른 파일로 결과를 다시 만듭니다
+외부 통신: 없음</textarea>
+    </div>
+
+    <div class="blk">
+      <div class="blk-head"><h3>④ 이미지 용량 목표 맞추기</h3><button class="copy">복사</button></div>
+      <textarea class="short" readonly style="height:150px">[블록] 목표 용량 맞추기
+분류: 이미지
+한 줄 설명: '1MB 이하'처럼 목표를 정하면 거기에 맞을 때까지 품질을 자동으로 낮춥니다.
+입력: 이미지 여러 장, 목표 용량(MB)
+출력: 목표를 맞춘 이미지 + 최종 품질과 용량 표시
+처리 방식: 품질을 조금씩 낮추며 다시 저장해 목표 이하가 되면 멈춥니다
+재처리: 설정을 바꾸면 고른 파일로 결과를 다시 만듭니다
+외부 통신: 없음</textarea>
+    </div>
+
+    <div class="note">
+      넷 다 마음에 들지 않으면 직접 쓰셔도 됩니다.
+      <b>입력 · 출력 · 설정</b> 세 줄만 구체적으로 적으면 됩니다. 비워두면 AI가 임의로 정합니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="ttl">
+        <h2>1차 프롬프트 · 내 도구함 만들기</h2>
+        <p class="goal">아래를 통째로 복사하고 대괄호 두 곳만 바꿉니다.</p>
+      </div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-head"><h3>프롬프트</h3><button class="copy">복사</button></div>
+      <textarea class="prompt" readonly style="height:400px">당신은 단일 HTML 파일로 동작하는 사무용 도구를 만드는 개발자입니다.
+아래 규격대로 완성된 HTML 파일 하나를 만들어 주세요.
+
+## 절대 규칙
+- 결과물은 HTML 파일 1개. CSS와 JavaScript를 모두 그 안에 넣습니다.
+- 사용자가 고른 파일을 외부로 절대 보내지 않습니다. fetch, XMLHttpRequest, form 전송 금지.
+- 모든 계산은 브라우저 안에서만 합니다.
+- 화면의 모든 문구는 한국어로, 실무자가 쓰는 말로 씁니다.
+
+## 화면 규격
+- 맨 위: 오늘 날짜와 '[[내 이름]]의 책상'이라는 제목.
+- 그 아래 '오늘 할 일' 메모: 입력칸 + Enter로 추가 + 체크박스 + 삭제 버튼.
+  적은 내용은 브라우저에 저장해 새로고침해도 남게 합니다.
+  저장이 안 되는 환경을 대비해 '목록 복사' 버튼도 둡니다.
+- 그 아래 '파일 도구 서랍' 버튼. 누르면 도구 카드가 펼쳐지고 다시 누르면 접힙니다.
+- 카드를 누르면 그 도구의 작업 화면으로 바뀌고 '← 돌아가기'로 복귀합니다.
+- 흰 바탕에 짙은 청록 강조색 하나, 모서리 12px, 얇은 회색 테두리.
+- 다크 모드에서도 읽히도록 색을 CSS 변수로 정의합니다.
+
+## 공통 동작 규격
+- 파일을 받는 도구는 드래그앤드롭과 클릭 선택을 모두 지원합니다.
+- 결과는 미리보기와 저장 버튼을 함께 보여줍니다.
+- 원본 파일은 건드리지 않고 결과는 항상 새 파일로 저장합니다.
+
+## 넣을 도구
+[[여기에 고른 블록 명세서 붙여넣기]]
+
+완성된 HTML 전체를 한 덩어리로 출력해 주세요. 설명은 코드 다음에 짧게만 적습니다.</textarea>
+    </div>
+
+    <div class="note">
+      <b>저장할 때 인코딩을 UTF-8 로 하세요.</b>
+      메모장에 붙여넣고 파일 이름은 <b>내책상.html</b>, 파일 형식은 <b>모든 파일</b>로 바꿉니다.
+      이걸 안 하면 한글이 깨집니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="ttl">
+        <h2>2차 프롬프트 · 도구 하나 더 얹기</h2>
+        <p class="goal">같은 대화에 이어서 붙여넣습니다.</p>
+      </div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-head"><h3>프롬프트</h3><button class="copy">복사</button></div>
+      <textarea class="short" readonly style="height:160px">방금 만든 도구함에 아래 도구를 하나 더 추가해 주세요.
+
+[[다른 블록 명세서 붙여넣기]]
+
+조건:
+- 기존 도구와 화면 규격, 색, 버튼 모양을 똑같이 맞춥니다.
+- 카드 목록에도 이 도구를 추가합니다.
+- 기존 도구의 동작은 하나도 바꾸지 않습니다.
+- 바뀐 부분만이 아니라 완성된 HTML 전체를 다시 출력해 주세요.</textarea>
+    </div>
+
+    <div class="idea">
+      <b>오늘 가져가는 것은 도구가 아니라 도구를 늘리는 방법입니다.</b>
+      쓸 일이 생기면 명세서 한 장만 더 적어 2차 프롬프트에 넣으면 됩니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="ttl">
+        <h2>막혔을 때 · 그대로 복사해서 보내기</h2>
+      </div>
+    </div>
+    <table>
+      <tr><th style="width:34%">증상</th><th>보낼 문장</th></tr>
+      <tr><td>화면이 하얗게만 나온다</td><td>화면이 흰색으로만 나옵니다. F12 콘솔에 나온 오류는 다음과 같습니다: (붙여넣기)</td></tr>
+      <tr><td>버튼을 눌러도 반응이 없다</td><td>OOO 버튼을 눌러도 아무 일도 일어나지 않습니다. 이 버튼의 동작만 다시 점검해 주세요.</td></tr>
+      <tr><td>결과가 이상하다</td><td>(입력)을 넣었더니 (결과)가 나왔습니다. 기대한 결과는 (기대)입니다.</td></tr>
+      <tr><td>할 일이 저장되지 않는다</td><td>새로고침하면 적어둔 할 일이 사라집니다. 브라우저 저장소에 보관하도록 고쳐 주세요.</td></tr>
+      <tr><td>코드가 중간에 끊겼다</td><td>코드가 중간에 끊겼습니다. 끊긴 지점부터 이어서 출력해 주세요.</td></tr>
+      <tr><td>한글이 깨진다</td><td>저장할 때 인코딩을 UTF-8 로 바꾸세요</td></tr>
+    </table>
+  </div>
+
+</section>
+
+<footer>AI 시민리더 강사 양성과정 · 바이브코딩 실습 가이드 <a href="#" id="eggLink" title="하나 더">·</a></footer>
 </div>
 
 <script>
   /* 탭 */
   var tabs = document.querySelectorAll('nav button');
+  var subnav = document.getElementById('subnav');
+
   tabs.forEach(function(btn){
     btn.addEventListener('click', function(){
       tabs.forEach(function(b){ b.classList.remove('on'); });
       btn.classList.add('on');
       document.querySelectorAll('section').forEach(function(s){ s.classList.remove('on'); });
       document.getElementById(btn.dataset.t).classList.add('on');
+
+      /* 하위 메뉴는 실습 주제 탭에서만 */
+      subnav.classList.toggle('on', btn.dataset.t === 's2');
+      subnav.querySelectorAll('button').forEach(function(b){ b.classList.remove('on'); });
+
       window.scrollTo({top:0, behavior:'smooth'});
     });
   });
+
+  /* 주제로 이동 — 고정된 상단 높이만큼 빼고 멈춥니다 */
+  subnav.querySelectorAll('button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var card = document.getElementById(btn.dataset.go);
+      if (!card) return;
+
+      subnav.querySelectorAll('button').forEach(function(b){ b.classList.remove('on'); });
+      btn.classList.add('on');
+
+      var topbar = document.querySelector('.topbar');
+      var gap = topbar ? topbar.offsetHeight + 12 : 12;
+      var y = card.getBoundingClientRect().top + window.pageYOffset - gap;
+
+      window.scrollTo({top: y < 0 ? 0 : y, behavior:'smooth'});
+    });
+  });
+
+  /* 푸터의 점 — 숨은 실습 */
+  var egg = document.getElementById('eggLink');
+  if (egg) {
+    egg.addEventListener('click', function(e){
+      e.preventDefault();
+      tabs.forEach(function(b){ b.classList.remove('on'); });
+      document.querySelectorAll('section').forEach(function(s){ s.classList.remove('on'); });
+      document.getElementById('s9').classList.add('on');
+      subnav.classList.remove('on');
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  }
 
   /* 프롬프트 상자 찾기 — textarea 또는 서식 있는 상자 */
   function boxOf(blk){
