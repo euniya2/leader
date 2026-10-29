@@ -1,0 +1,3937 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='8'%20fill='%234F46E5'/%3E%3Ctext%20x='16'%20y='23'%20font-size='19'%20font-weight='700'%20text-anchor='middle'%20fill='white'%20font-family='Arial%2Csans-serif'%3EJ%3C/text%3E%3C/svg%3E">
+<title>나의 강의 대시보드 · 단계별 코드</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#fff; --line:#e3e6ea; --text:#1c2024; --sub:#6b7280;
+    --accent:#2f6feb; --accent-soft:#eaf1ff; --warn:#b45309; --warn-soft:#fff7ed;
+  }
+  *{box-sizing:border-box}
+  html{scrollbar-gutter:stable}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:"Pretendard","Malgun Gothic",-apple-system,BlinkMacSystemFont,sans-serif;
+    line-height:1.65; -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:28px 18px 80px}
+
+  .topbar{
+    position:sticky; top:0; z-index:30;
+    background:var(--bg);
+    margin:0 -18px 20px; padding:22px 18px 12px;
+    border-bottom:1px solid var(--line);
+  }
+  header{display:flex; align-items:center; gap:14px; margin-bottom:12px}
+  header .ttl{flex:1 1 auto; min-width:0}
+  header h1{font-size:22px; margin:0 0 4px; letter-spacing:-.02em}
+  header p{margin:0; color:var(--sub); font-size:14px}
+
+  .tools{margin-left:auto; display:flex; flex-wrap:wrap; gap:6px}
+  .tool-ico{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:36px; height:36px; border-radius:10px; overflow:hidden;
+    border:1px solid var(--line); background:#fff;
+    text-decoration:none; color:var(--sub);
+    font-size:11px; font-weight:700; line-height:1;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .tool-ico:hover{border-color:var(--accent); box-shadow:0 2px 8px rgba(47,111,235,.14)}
+  .tool-ico img{width:20px; height:20px; display:block}
+  @media (max-width:760px){ .tools{margin-left:0; margin-top:6px} }
+
+  .guide{
+    background:var(--accent-soft); border:1px solid #cfe0ff; border-radius:12px;
+    padding:14px 18px; margin:0 0 24px; font-size:14px;
+  }
+  .guide b{color:var(--accent)}
+  .guide ol{margin:8px 0 0; padding-left:20px}
+
+  nav{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-bottom:0}
+  nav button{
+    border:1px solid var(--line); background:var(--card); color:var(--sub);
+    padding:9px 15px; border-radius:999px; font-size:14px; cursor:pointer;
+    font-family:inherit; font-weight:600;
+  }
+  nav button:hover{border-color:#b9c2cc}
+  nav button.on{background:var(--accent); border-color:var(--accent); color:#fff}
+
+  nav.sub{display:none; margin-top:10px; padding-top:10px; border-top:1px dashed var(--line)}
+  nav.sub.on{display:flex}
+  nav.sub button{padding:6px 13px; font-size:13px}
+  nav.sub button.on{background:var(--accent-soft); border-color:var(--accent); color:var(--accent)}
+
+  section{display:none}
+  section.on{display:block}
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:20px 22px; margin-bottom:16px;
+  }
+  .card h2{font-size:17px; margin:0 0 2px; letter-spacing:-.01em}
+  .card .goal{color:var(--sub); font-size:14px; margin:0 0 14px}
+
+  details.fold > summary{cursor:pointer; list-style:none}
+  details.fold > summary::-webkit-details-marker{display:none}
+  details.fold > summary h2::after{content:"  ▾ 펼치기"; font-size:13px; color:var(--accent); font-weight:700}
+  details.fold[open] > summary h2::after{content:"  ▴ 접기"}
+  details.fold:not([open]) > summary .goal{margin-bottom:0}
+  details.fold-sub > summary{cursor:pointer; list-style:none; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:#fbfcfd}
+  details.fold-sub > summary::-webkit-details-marker{display:none}
+  details.fold-sub > summary h3{display:inline; font-size:14px; margin:0; color:var(--sub); font-weight:700}
+  details.fold-sub > summary h3::after{content:"  ▾ 코드 펼치기"; font-size:13px; color:var(--accent)}
+  details.fold-sub[open] > summary h3::after{content:"  ▴ 코드 접기"}
+  textarea.autosize{white-space:pre-wrap; overflow:hidden; resize:none}
+
+  .flow{display:flex; align-items:stretch; gap:6px; flex-wrap:wrap; margin-top:12px}
+  .flow .nd{flex:1 1 0; min-width:120px; border:1px solid var(--line); border-radius:12px; padding:12px 10px; text-align:center; background:#fbfcfd; display:flex; flex-direction:column; justify-content:center}
+  .flow .nd b{display:block; font-size:15px}
+  .flow .nd span{display:block; font-size:12.5px; color:var(--sub); margin-top:2px}
+  .flow .nd small{display:block; font-size:12px; color:var(--accent); margin-top:6px; font-weight:600}
+  .flow .nd.k-sheet{background:#ecf8f1; border-color:#bfe6cf}
+  .flow .nd.k-script{background:var(--accent-soft); border-color:#cfe0ff}
+  .flow .nd.k-notion{background:#f3f4f6; border-color:#dfe2e6}
+  .flow .ar{align-self:center; color:var(--sub); font-size:18px; flex:0 0 auto}
+  .flow.steps .nd{opacity:.55}
+  .flow.steps .nd.now{opacity:1; background:var(--accent-soft); border:2px solid var(--accent)}
+  .flow-foot{font-size:12.5px; color:var(--sub); margin:8px 0 0; text-align:center}
+  .defs{margin-top:14px; font-size:13.5px; line-height:1.9}
+  .defs b{display:inline-block; min-width:64px}
+  @media (max-width:600px){ .flow .ar{display:none} .flow .nd{flex:1 1 100%} }
+
+  .card-head{
+    display:flex; align-items:flex-start; gap:13px;
+    margin:-20px -22px 16px; padding:16px 22px;
+    background:var(--accent-soft);
+    border-bottom:1px solid #d7e4ff;
+    border-radius:14px 14px 0 0;
+  }
+  .card-head .ico{
+    flex:0 0 auto; width:34px; height:34px; border-radius:10px;
+    background:#fff; border:1px solid #cfe0ff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; font-weight:800; color:var(--accent);
+    font-variant-numeric:tabular-nums;
+  }
+  .card-head .ttl{flex:1 1 auto; min-width:0}
+  .card-head h2{color:#1b3f8f}
+  .card-head .goal{margin:0; color:#5b6b86}
+
+  .blk{margin-top:18px}
+  .blk-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:7px; gap:10px}
+  .blk-head h3{font-size:14px; margin:0; color:var(--sub); font-weight:700}
+  .copy{
+    border:1px solid var(--line); background:#fafbfc; color:var(--text);
+    padding:6px 13px; border-radius:8px; font-size:13px; cursor:pointer;
+    font-family:inherit; font-weight:600; white-space:nowrap;
+  }
+  .copy:hover{border-color:var(--accent); color:var(--accent)}
+  .copy.done{background:var(--accent); border-color:var(--accent); color:#fff}
+  .blk-head .btns{display:flex; gap:6px}
+  .expand{
+    border:1px solid var(--line); background:#fff; color:var(--sub);
+    padding:6px 13px; border-radius:8px; font-size:13px; cursor:pointer;
+    font-family:inherit; font-weight:600; white-space:nowrap;
+  }
+  .expand:hover{border-color:var(--accent); color:var(--accent)}
+
+  textarea{
+    width:100%; border:1px solid var(--line); border-radius:10px; background:#fbfcfd;
+    padding:13px 14px; font-family:"D2Coding","Consolas","Menlo",monospace;
+    font-size:12.5px; line-height:1.6; color:#22262b; resize:vertical; white-space:pre;
+  }
+  textarea.prompt{height:230px}
+  textarea.code{height:430px}
+  textarea.short{height:170px}
+
+  .check-title{font-size:14px; color:var(--sub); margin:14px 0 0}
+  ul.check{margin:10px 0 0; padding-left:0; list-style:none; font-size:14px}
+  ul.check li{padding:3px 0 3px 24px; position:relative}
+  ul.check li:before{content:"☐"; position:absolute; left:2px; color:var(--sub)}
+
+  table{width:100%; border-collapse:collapse; font-size:13.5px; margin-top:10px}
+  th,td{border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top}
+  th{background:#f3f5f7; font-weight:700}
+
+  .note{
+    background:var(--warn-soft); border:1px solid #fed7aa; border-radius:10px;
+    padding:12px 15px; margin-top:16px; font-size:13.5px; color:#7c3f12;
+  }
+  .note b{color:var(--warn)}
+
+  code.kbd{background:#eef1f4; padding:1px 6px; border-radius:5px; font-size:13px}
+
+  .fields{
+    margin-top:6px; background:#fbfcfd;
+    border:1px solid var(--line); border-radius:10px; overflow:hidden;
+  }
+  .field{
+    display:flex; align-items:center; gap:10px;
+    padding:8px 12px; border-bottom:1px solid var(--line); font-size:13.5px;
+  }
+  .field:last-child{border-bottom:none}
+  .field .fk{flex:0 0 76px; color:var(--sub); font-weight:700}
+  .field .fv{flex:1 1 auto; min-width:0; word-break:break-word}
+  .copy-one{
+    flex:0 0 auto; border:1px solid var(--line); background:#fff; color:var(--sub);
+    padding:4px 10px; border-radius:7px; font-size:12px; cursor:pointer;
+    font-family:inherit; font-weight:600;
+  }
+  .copy-one:hover{border-color:var(--accent); color:var(--accent)}
+  .copy-one.done{background:var(--accent); border-color:var(--accent); color:#fff}
+  @media (max-width:600px){
+    .field{flex-wrap:wrap}
+    .field .fk{flex:0 0 100%}
+  }
+
+  @media (max-width:600px){
+    .wrap{padding:20px 12px 60px}
+    .card{padding:16px 14px}
+    textarea.code{height:340px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="topbar">
+  <header>
+    <div class="ttl">
+      <h1>나의 강의 대시보드 · 단계별 코드</h1>
+      <p>구글 시트 → 노션 자동화 · Apps Script</p>
+    </div>
+    <div class="tools">
+      <a class="tool-ico" href="https://www.notion.so" target="_blank" rel="noopener" title="노션">
+        <img src="https://www.google.com/s2/favicons?domain=notion.so&amp;sz=64" alt="노션" width="20" height="20"></a>
+      <a class="tool-ico" href="https://sheets.google.com" target="_blank" rel="noopener" title="구글 시트">
+        <img src="https://www.gstatic.com/images/branding/product/1x/sheets_2020q4_48dp.png" alt="시트" width="20" height="20"></a>
+      <a class="tool-ico" href="https://script.google.com/home" target="_blank" rel="noopener" title="Apps Script">
+        <img src="https://www.google.com/s2/favicons?domain=script.google.com&amp;sz=64" alt="Apps Script" width="20" height="20"></a>
+      <a class="tool-ico" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" title="AI Studio · API 키">
+        <img src="https://www.google.com/s2/favicons?domain=aistudio.google.com&amp;sz=64" alt="AI Studio" width="20" height="20"></a>
+      <a class="tool-ico" href="https://gemini.google.com" target="_blank" rel="noopener" title="Gemini">
+        <img src="https://www.gstatic.com/images/branding/product/1x/gemini_48dp.png" alt="제미나이" width="20" height="20"></a>
+    </div>
+  </header>
+
+  <nav id="tabs">
+    <button class="on" data-g="notion">노션</button>
+    <button data-g="sheet">시트 연결</button>
+    <button data-g="ai">AI 지도안</button>
+    <button data-g="fix">문제 해결</button>
+  </nav>
+
+  <nav class="sub" data-for="sheet">
+    <button class="on" data-t="sheet-prep">준비</button>
+    <button data-t="v1">v1 기본 전송</button>
+    <button data-t="v4">v2 스마트 동기화</button>
+    <button data-t="extra">더 해보기</button>
+  </nav>
+
+  <nav class="sub" data-for="ai">
+    <button class="on" data-t="ai-prep">준비</button>
+    <button data-t="v5">v3 지도안 생성</button>
+  </nav>
+</div>
+
+
+<!-- ================= 노션 ================= -->
+<section id="notion" class="on">
+  <div class="card">
+    <h2>오늘 만들 것 · 나의 강의 대시보드</h2>
+    <p class="goal">시트에 강의 정보를 적으면 노션에 강의계획서가 생기고, AI가 지도안까지 채웁니다.</p>
+    <table>
+      <tr><th style="width:110px">메뉴</th><th>하는 일</th></tr>
+      <tr><td><b>노션</b></td><td>DB · 보기 · 수식 · 버튼으로 코드 없이 정리</td></tr>
+      <tr><td><b>시트 연결</b></td><td>시트에 있는 자료를 노션으로</td></tr>
+      <tr><td><b>AI 지도안</b></td><td>채워진 내용으로 AI가 지도안 작성</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="ico">1</div>
+      <div class="ttl">
+        <h2>새 페이지 · 데이터베이스 추가</h2>
+        <p class="goal">강의를 담을 페이지와 표를 먼저 만듭니다.</p>
+      </div>
+    </div>
+
+    <table>
+      <tr><th style="width:70px">순서</th><th>하는 일</th></tr>
+      <tr><td>1</td><td>좌측 사이드바 <code class="kbd">+</code> → <b>새 페이지</b></td></tr>
+      <tr><td>2</td><td>제목 : <code class="kbd">나의 강의 대시보드</code></td></tr>
+      <tr><td>3</td><td>본문에 <code class="kbd">/데이터베이스</code> → <b>인라인</b> 선택</td></tr>
+      <tr><td>4</td><td>DB 이름 : <code class="kbd">강의 DB</code></td></tr>
+    </table>
+
+    <div class="note">
+      <b>전체 페이지가 아니라 인라인으로 만듭니다.</b><br>
+      7번에서 버튼을 DB 위에 놓아야 하는데, 전체 페이지 DB에는 블록을 놓을 자리가 없습니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="ico">2</div>
+      <div class="ttl">
+        <h2>노션 DB 속성</h2>
+        <p class="goal">이름과 타입이 정확히 같아야 합니다.</p>
+      </div>
+    </div>
+    <table>
+      <tr><th style="width:50px">순번</th><th>속성명</th><th>노션 타입</th><th>시트 열</th></tr>
+      <tr><td>1</td><td>강의명</td><td>제목 (title)</td><td>A</td></tr>
+      <tr><td>2</td><td>대상</td><td>텍스트</td><td>B</td></tr>
+      <tr><td>3</td><td>강의날짜</td><td>날짜</td><td>C</td></tr>
+      <tr><td>4</td><td>차시</td><td>텍스트 <b>(숫자 아님)</b></td><td>D</td></tr>
+      <tr><td>5</td><td>수업주제</td><td>텍스트</td><td>E</td></tr>
+      <tr><td>6</td><td>수업목표</td><td>텍스트</td><td>F</td></tr>
+      <tr><td>7</td><td>수업내용</td><td>텍스트</td><td>G</td></tr>
+      <tr><td>8</td><td>비고</td><td>텍스트</td><td>H</td></tr>
+      <tr><td>9</td><td>상태</td><td>상태 (status) — 옵션 이름 바꾸기 : <b>시작 전 → 진행예정</b> · <b>진행 중 → 준비중</b> (완료는 그대로)</td><td>—</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="ico">3</div>
+      <div class="ttl">
+        <h2>구조 확인용 데이터 입력</h2>
+        <p class="goal">속성을 다 만든 뒤, 뷰가 보이도록 한 건만 넣습니다.</p>
+      </div>
+    </div>
+    <div class="blk">
+      <div class="blk-head"><h3>예시 1건</h3></div>
+      <div class="fields">
+        <div class="field"><span class="fk">강의명</span><span class="fv">캔바로 만드는 수업 안내문</span><button class="copy-one">복사</button></div>
+        <div class="field"><span class="fk">대상</span><span class="fv">초등 교사 (캔바 처음)</span><button class="copy-one">복사</button></div>
+        <div class="field"><span class="fk">강의날짜</span><span class="fv">2026-11-28</span><button class="copy-one">복사</button></div>
+        <div class="field"><span class="fk">차시</span><span class="fv">1</span><button class="copy-one">복사</button></div>
+        <div class="field"><span class="fk">상태</span><span class="fv">준비중</span><button class="copy-one">복사</button></div>
+      </div>
+    </div>
+    <div class="note">
+      <b>수업주제 · 수업목표 · 수업내용 · 비고는 비워 둡니다.</b><br>
+      캘린더 · 보드 보기를 확인하는 데는 날짜와 상태만 있으면 됩니다. 내용이 모두 채워진 강의는 시트 연결에서 보냅니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="ico">4</div>
+      <div class="ttl">
+        <h2>보기 — 표 · 캘린더 · 보드</h2>
+        <p class="goal">같은 데이터를 세 가지 모습으로 봅니다.</p>
+      </div>
+    </div>
+    <table>
+      <tr><th style="width:90px">보기</th><th>보여주는 것</th><th>언제 쓰나</th></tr>
+      <tr><td><b>표</b></td><td>모든 속성을 한 줄에 펼쳐서</td><td>내용을 입력하고 고칠 때</td></tr>
+      <tr><td><b>캘린더</b></td><td><code class="kbd">강의날짜</code> 를 달력 위에</td><td>강의가 언제 몰려 있는지 볼 때</td></tr>
+      <tr><td><b>보드</b></td><td><code class="kbd">상태</code> 별로 칸을 나눠 카드로</td><td>준비 진행 상황을 볼 때</td></tr>
+    </table>
+
+    <div class="note">
+      <b>데이터는 하나입니다.</b> 옮기거나 복사한 게 아니라 보는 방식만 바뀝니다.<br>
+      표에서는 할 수 없던 일이고, 이것이 <b>표와 데이터베이스의 차이</b>입니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="ico">5</div>
+      <div class="ttl">
+        <h2>D-day 속성 추가</h2>
+        <p class="goal">표 맨 오른쪽 <b>+</b> → 유형 <b>수식</b> → 이름 <b>D-day</b> → 아래 수식 붙여넣기</p>
+      </div>
+    </div>
+
+    <div class="blk">
+      <div class="blk-head"><h3>수식 — 그대로 붙여넣기</h3><button class="copy">복사</button></div>
+      <textarea class="short" style="height:110px" readonly>if(empty(prop("강의날짜")), "",
+ let(days, dateBetween(prop("강의날짜"), today(), "days"),
+  days > 0 ? "D-" + days : (days == 0 ? "D-DAY" : "종료")))</textarea>
+      <p class="goal" style="margin-top:8px"><code class="kbd">now()</code> 가 아니라 <code class="kbd">today()</code> 입니다. <code class="kbd">now()</code> 에는 시각이 들어 있어 하루가 모자라게 나옵니다.</p>
+    </div>
+
+    <div class="blk">
+      <div class="blk-head"><h3>직접 만들어 보려면 — AI에게 물어볼 프롬프트</h3><button class="copy">복사</button></div>
+      <textarea class="prompt" readonly>노션 데이터베이스의 수식 속성에 넣을 수식을 만들어줘.
+
+- 기준 속성 : 강의날짜 (날짜 유형)
+- 오늘을 기준으로 강의까지 남은 일수를 표시할 것
+
+[결과 형식]
+- 아직 남았으면 : D-12 처럼 'D-' 뒤에 남은 일수
+- 당일이면 : D-DAY
+- 이미 지났으면 : 종료
+- 강의날짜가 비어 있으면 아무것도 표시하지 않음 (빈 문자열)
+
+[조건]
+- 노션 수식 2.0 문법으로 작성할 것
+- 오늘 날짜는 now()가 아니라 today()로 계산할 것
+  (now()는 시각이 섞여 하루가 모자라게 나옴)
+- 수식 편집창에 그대로 붙여넣을 수 있는 형태로
+- 설명은 빼고 수식만 줘</textarea>
+      <p class="goal" style="margin-top:8px">완성 수식과 생김새가 달라도 결과가 같으면 맞습니다. 오류가 나면 <b>&ldquo;노션 수식 2.0 문법이 맞는지 확인해줘&rdquo;</b> 라고 다시 물어보세요.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="ico">6</div>
+      <div class="ttl">
+        <h2>템플릿 만들기</h2>
+        <p class="goal">버튼으로 만드는 페이지에 들어갈 양식입니다.</p>
+      </div>
+    </div>
+
+    <table>
+      <tr><th style="width:70px">순서</th><th>하는 일</th></tr>
+      <tr><td>1</td><td>강의 DB 우측 상단 <code class="kbd">새로 만들기</code> 옆 <code class="kbd">∨</code> → <b>새 템플릿</b></td></tr>
+      <tr><td>2</td><td><b>제목 : <code class="kbd">템플릿1</code></b> — 템플릿 이름이 됩니다. 새 페이지 제목은 버튼에서 비웁니다</td></tr>
+      <tr><td>3</td><td>속성 칸도 비워 둡니다 — 강의명 · 날짜는 매번 다르니까요</td></tr>
+      <tr><td>4</td><td><b>본문</b>에만 아래 네 줄 입력</td></tr>
+    </table>
+
+    <div class="blk">
+      <div class="blk-head"><h3>본문에 넣을 네 줄</h3><button class="copy">복사</button></div>
+      <textarea class="short" style="height:110px" readonly>🎯 지도안 (도입-전개-정리)
+🧰 준비물 · 체크리스트
+📎 자료 링크
+📝 강의 후 메모</textarea>
+    </div>
+
+    <div class="note">
+      <b>템플릿에는 값을 넣지 않습니다.</b> 매번 똑같이 적어야 하는 <b>항목 이름만</b> 미리 넣어 두는 것입니다.<br>
+      <code class="kbd">🎯 지도안</code> 은 비워 둡니다. 오후에 AI가 채우는 칸입니다.<br>
+      제목을 <code class="kbd">템플릿1</code> 로 적으면 다음 단계 버튼에서 이 이름으로 고릅니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="ico">7</div>
+      <div class="ttl">
+        <h2>버튼 만들기</h2>
+        <p class="goal">클릭 한 번으로 페이지를 만들고 양식까지 띄웁니다.</p>
+      </div>
+    </div>
+
+    <table>
+      <tr><th style="width:70px">순서</th><th>하는 일</th></tr>
+      <tr><td>1</td><td>DB <b>위쪽 빈 줄</b>에 <code class="kbd">/버튼</code></td></tr>
+      <tr><td>2</td><td>이름 : <code class="kbd">➕ 새 강의 추가</code></td></tr>
+      <tr><td>3</td><td>작업 ① <b>페이지 추가 위치</b> → <code class="kbd">강의 DB</code></td></tr>
+      <tr><td>4</td><td>그 옆 칸에서 <b>템플릿 선택</b> → <code class="kbd">템플릿1</code> ⭐</td></tr>
+      <tr><td>5</td><td>속성 편집 → <code class="kbd">강의명 = 빈칸</code> · <code class="kbd">상태 = 준비중</code></td></tr>
+      <tr><td>6</td><td>작업 ② <b>페이지, 양식 또는 URL 열기</b> → <code class="kbd">① 페이지 추가됨</code> → <b>중앙에서 보기</b></td></tr>
+    </table>
+
+    <p class="goal" style="margin-top:10px">설정이 끝나면 작업 줄이 이렇게 보입니다.</p>
+    <div class="blk" style="margin-top:6px">
+      <textarea class="short" style="height:70px" readonly>강의 DB 에 페이지 추가   템플릿1 (으)로
+  Aa 강의명 : 빈칸
+  상태 : 준비중
+① 페이지 추가됨   열기 : 중앙에서 보기</textarea>
+    </div>
+
+    <p class="check-title" style="margin-top:14px"><b>눌러서 확인</b></p>
+    <ul class="check">
+      <li>강의 DB에 새 행이 생긴다</li>
+      <li>상태가 <b>준비중</b>으로 들어가 있다</li>
+      <li>페이지가 <b>화면 중앙</b>에 바로 열린다</li>
+      <li>제목이 비어 있어 <b>강의명을 바로 입력</b>할 수 있다</li>
+      <li>본문에 <b>양식 네 줄</b>이 딸려 나온다</li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ================= 시트 연결 · 준비 ================= -->
+<section id="sheet-prep">
+  <div class="card">
+    <h2>시트에서 노션으로 보내는 이유</h2>
+    <p class="goal">강의 정보는 표에 적는 게 빠르고, 지도안처럼 긴 글은 노션 페이지가 편합니다. 보내는 코드는 시트 안에서 돌아갑니다.</p>
+    <div class="flow">
+      <div class="nd k-sheet"><b>시트</b><span>강의 정보 적기</span></div>
+      <div class="ar">→</div>
+      <div class="nd k-script"><b>Apps Script</b><span>보내는 일꾼 (시트 안의 코드)</span><small>🔑 API 키를 내고 요청</small></div>
+      <div class="ar">→</div>
+      <div class="nd k-notion"><b>노션</b><span>지도안 쌓고 일하기</span><small>창구(API)를 열고 기다림</small></div>
+    </div>
+    <div class="defs">
+      <b>API</b> 다른 프로그램을 쓰는 정해진 방법 (통로)<br>
+      <b>API 키</b> 그 프로그램에서 "나"임을 증명하는 열쇠
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>미리 준비할 것</h2>
+    <ul class="check">
+      <li>노션 통합 생성 → 시크릿 키 (ntn_...)<br>
+        <a href="https://www.notion.so/my-integrations" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">notion.so/my-integrations</a> 에서 만듭니다</li>
+      <li><b>DB에 API 연결 추가</b> — 페이지 우측 상단 ⋯ → 연결</li>
+      <li>DATABASE ID — DB를 <b>전체 페이지로 열기</b> → 주소의 <code class="kbd">?v=</code> 앞 32자리</li>    </ul>
+    <div class="note">
+      <b>가장 흔한 실패</b> — DB에 API 연결을 추가하지 않으면, 토큰이 맞아도 데이터베이스를 찾지 못합니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>시트 컬럼</h2>
+    <table>
+      <tr><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>H</th><th>I</th></tr>
+      <tr><td>강의명</td><td>대상</td><td>강의날짜</td><td>차시</td><td>수업주제</td><td>수업목표</td><td>수업내용</td><td>비고</td><td>완료</td></tr>
+    </table>
+
+    <div class="blk">
+      <div class="blk-head"><h3>머리글 한 줄 — A1 칸에 붙여넣기</h3><button class="copy">복사</button></div>
+      <textarea class="short" style="height:52px" readonly>강의명	대상	강의날짜	차시	수업주제	수업목표	수업내용	비고	완료</textarea>
+    </div>
+    <p class="goal" style="margin-top:10px">I열은 머리글만 두고, 아래 칸은 코드가 채웁니다. J열(노션ID)은 v2에서 코드가 직접 만듭니다.</p>
+  </div>
+
+  <div class="card">
+    <h2>구글 시트 샘플 데이터</h2>
+    <p class="goal">내 강의가 없을 때 쓰세요. A2 칸에 붙여넣으면 3건이 한 번에 들어갑니다.</p>
+
+    <div class="blk">
+      <div class="blk-head"><h3>샘플 데이터 3건 — A2 칸에 붙여넣기</h3><button class="copy">복사</button></div>
+      <textarea class="short" readonly>노션으로 시작하는 업무 정리	성인 직장인 (노션 처음)	2026-11-07	1	노션 기본 블록과 페이지 구조 익히기	노션의 블록 개념을 이해하고 페이지를 직접 만들 수 있다. 토글과 콜아웃으로 내용을 정리할 수 있다.	슬래시 명령으로 블록을 추가하는 방법을 익힌다. 제목·토글·콜아웃으로 업무 메모를 구조화한다. 하위 페이지를 만들어 주제별로 나눈다.	20명 / PC실 / 계정 사전가입 필요
+노션 데이터베이스 실무 활용	성인 직장인 (노션 기초 수료)	2026-11-14	2	표와 데이터베이스의 차이, 뷰 전환	속성 유형을 목적에 맞게 설계할 수 있다. 같은 데이터를 보드와 캘린더로 전환해 볼 수 있다.	표와 데이터베이스가 무엇이 다른지 비교한다. 속성 유형을 정해 업무 목록을 만든다. 필터와 정렬로 필요한 것만 추린다. 보드와 캘린더 뷰로 전환해 일정 관리에 적용한다.	20명 / PC실 / 1차시 수료자
+노션 버튼으로 반복 업무 줄이기	성인 직장인 (노션 활용 경험 있음)	2026-11-21	3	버튼·수식·템플릿으로 코드 없이 자동화	버튼으로 페이지를 자동 생성할 수 있다. 수식으로 남은 기간을 자동 계산할 수 있다.	버튼 블록을 만들어 클릭 한 번으로 항목을 추가한다. 템플릿으로 매번 같은 양식이 나오게 한다. 날짜 수식으로 D-day를 표시한다. 자동화로 줄일 수 있는 업무를 각자 찾아본다.	12명 / 노트북 지참 / 무료 플랜 기준</textarea>
+      <p class="goal" style="margin-top:8px">붙여넣은 뒤 C열이 날짜로 인식됐는지 확인하세요. I열은 비워 둡니다.</p>
+    </div>
+
+    <div class="blk">
+      <div class="blk-head"><h3>샘플 데이터 3건 — 항목별로 보기</h3><button class="copy">복사</button></div>
+      <textarea class="code" style="white-space:pre-wrap; overflow-x:hidden; height:560px" readonly>[샘플 1 · 입문]
+강의명 : 노션으로 시작하는 업무 정리
+대상 : 성인 직장인 (노션 처음)
+강의날짜 : 2026-11-07
+차시 : 1
+수업주제 : 노션 기본 블록과 페이지 구조 익히기
+수업목표 : 노션의 블록 개념을 이해하고 페이지를 직접 만들 수 있다. 토글과 콜아웃으로 내용을 정리할 수 있다.
+수업내용 : 슬래시 명령으로 블록을 추가하는 방법을 익힌다. 제목·토글·콜아웃으로 업무 메모를 구조화한다. 하위 페이지를 만들어 주제별로 나눈다.
+비고 : 20명 / PC실 / 계정 사전가입 필요
+
+[샘플 2 · 데이터베이스]
+강의명 : 노션 데이터베이스 실무 활용
+대상 : 성인 직장인 (노션 기초 수료)
+강의날짜 : 2026-11-14
+차시 : 2
+수업주제 : 표와 데이터베이스의 차이, 뷰 전환
+수업목표 : 속성 유형을 목적에 맞게 설계할 수 있다. 같은 데이터를 보드와 캘린더로 전환해 볼 수 있다.
+수업내용 : 표와 데이터베이스가 무엇이 다른지 비교한다. 속성 유형을 정해 업무 목록을 만든다. 필터와 정렬로 필요한 것만 추린다. 보드와 캘린더 뷰로 전환해 일정 관리에 적용한다.
+비고 : 20명 / PC실 / 1차시 수료자
+
+[샘플 3 · 자동화]
+강의명 : 노션 버튼으로 반복 업무 줄이기
+대상 : 성인 직장인 (노션 활용 경험 있음)
+강의날짜 : 2026-11-21
+차시 : 3
+수업주제 : 버튼·수식·템플릿으로 코드 없이 자동화
+수업목표 : 버튼으로 페이지를 자동 생성할 수 있다. 수식으로 남은 기간을 자동 계산할 수 있다.
+수업내용 : 버튼 블록을 만들어 클릭 한 번으로 항목을 추가한다. 템플릿으로 매번 같은 양식이 나오게 한다. 날짜 수식으로 D-day를 표시한다. 자동화로 줄일 수 있는 업무를 각자 찾아본다.
+비고 : 12명 / 노트북 지참 / 무료 플랜 기준</textarea>
+    </div>
+
+    <div class="note">
+      <b>대상과 비고를 구체적으로</b> 쓸수록 AI 지도안이 달라집니다.<br>
+      대상 : "성인" ❌ → "성인 직장인 (노션 처음)" ✅<br>
+      비고 : <b>인원 / 환경 / 제약</b> 순서로
+    </div>
+  </div>
+</section>
+
+
+<!-- ================= v1 ================= -->
+<section id="v1">
+  <div class="card">
+    <h2>시트 연결 실습 흐름</h2>
+    <div class="flow steps">
+      <div class="nd"><b>준비</b><span>API 키 · 시트</span><small>노션 토큰 · DB ID</small></div>
+      <div class="ar">→</div>
+      <div class="nd now"><b>v1 기본 전송</b><span>노션에 페이지</span><small>📤 노션으로 보내기</small></div>
+      <div class="ar">→</div>
+      <div class="nd"><b>v2 스마트 동기화</b><span>J열 ID · 수정</span><small>다시 보내도 중복 없음</small></div>
+      <div class="ar">→</div>
+      <div class="nd"><b>v3 AI 지도안</b><span>🎯 칸 채우기</span><small>🤖 지도안 생성</small></div>
+    </div>
+    <p class="flow-foot">더 해보기 : 선택 전송 · 진행률</p>
+  </div>
+
+  <div class="guide">
+    프롬프트로 직접 만들어 보고, <b>15분 넘게 막히면 완성 코드</b>를 쓰세요.
+    코드를 붙여넣은 뒤에는 <b>맨 위 상수</b>를 자기 것으로 바꾸고 저장 → <b>시트 새로고침</b>입니다.
+  </div>
+
+  <div class="card">
+    <h2>v1 · 기본 전송</h2>
+    <p class="goal">시트의 강의 데이터를 노션에 페이지로 만듭니다.</p>
+
+    <div class="blk">
+      <div class="blk-head"><h3>프롬프트</h3><button class="copy">복사</button></div>
+      <textarea class="prompt" readonly>구글 시트에 연결된 Apps Script로, 시트의 강의 데이터를 노션 데이터베이스에
+자동 등록하는 코드를 작성해줘.
+
+[환경]
+- 구글 시트 확장 프로그램 → Apps Script (파일 1개)
+- 노션 API 사용, Notion-Version은 반드시 '2022-06-28'로 고정
+
+[시트 구조] 1행 머리글, 2행부터 데이터
+A 강의명 / B 대상 / C 강의날짜 / D 차시 / E 수업주제 /
+F 수업목표 / G 수업내용 / H 비고 / I 완료
+
+[노션 속성] 아래 '속성 이름'을 코드에 그대로 사용할 것 (번역·변경 금지)
+
+속성 이름   | 노션 타입
+강의명      | title
+강의날짜    | date  (YYYY-MM-DD)
+대상        | rich_text
+차시        | rich_text
+수업주제    | rich_text
+수업목표    | rich_text
+수업내용    | rich_text
+비고        | rich_text
+상태        | status, 값은 항상 "준비중"
+
+[노션 페이지 본문(children) 구조]
+1) 콜아웃(💡) : 대상 · 차시 · 비고를 한 줄로 요약
+2) heading_2 : 🎯 지도안 (도입-전개-정리)  → 아래에 빈 문단
+3) heading_2 : 🧰 준비물 · 체크리스트  → 빈 체크박스 1개
+4) heading_2 : 📎 자료 링크  → 빈 불릿 1개
+5) heading_2 : 📝 강의 후 메모  → 빈 문단
+- 표(table) 블록은 사용하지 말 것
+- 콜아웃·강조 텍스트에서 annotations는 text 객체 밖에 별도로 둘 것
+
+[동작]
+- 시트 상단에 '📤 노션' 커스텀 메뉴를 만들고 '노션으로 보내기' 항목 추가 (onOpen)
+- I열에 ✅ 가 있는 행은 건너뛰고, 없는 행만 전송
+- 전송 성공 시 I열에 ✅ 기록
+- 실패 시 I열에 ❌와 노션이 보낸 에러 메시지를 함께 기록
+- 강의명이 비어 있는 행은 건너뜀
+- 강의날짜가 비어 있으면 date 속성 자체를 넣지 말 것
+- 날짜는 Date 객체·'2026.9.25'·'2026-9-25' 등 어떤 형태로 들어와도
+  YYYY-MM-DD로 안전하게 변환
+- 완료 후 성공/실패 건수를 알림창으로 표시
+
+[코드 형식]
+- 맨 위에 NOTION_TOKEN, DATABASE_ID, SHEET_NAME 세 상수를 모아두고
+  '이 3줄만 수정하세요' 주석 표시
+- 초보자가 읽을 수 있게 함수를 짧게 나누고 한국어 주석 달기</textarea>
+    </div>
+
+    <div class="blk">
+      <div class="blk-head"><h3>완성 코드</h3><button class="copy">복사</button></div>
+      <textarea class="code" readonly>/************************************************************
+ * 이 3줄만 수정하세요
+ ************************************************************/
+const NOTION_TOKEN = "ntn_여기에_토큰";
+const DATABASE_ID  = "여기에_32자리_ID";
+const SHEET_NAME   = "강의목록";
+
+/************************************************************
+ * 메뉴 생성
+ ************************************************************/
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu("📤 노션")
+    .addItem("노션으로 보내기", "sendToNotion")
+    .addToUi();
+}
+
+/************************************************************
+ * 메인 함수
+ ************************************************************/
+function sendToNotion() {
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+
+  if (!sheet) {
+    SpreadsheetApp.getUi().alert("시트를 찾을 수 없습니다.");
+    return;
+  }
+
+  const values = sheet.getDataRange().getValues();
+
+  let success = 0;
+  let fail = 0;
+
+  for (let i = 1; i < values.length; i++) {
+
+    const row = values[i];
+
+    const title = String(row[0]).trim();
+
+    if (!title) continue;                        // 강의명 없으면 건너뜀
+    if (String(row[8]).includes("✅")) continue;  // 완료된 행 건너뜀
+
+    try {
+
+      const result = callNotion(createPageObject(row));
+
+      if (result.ok) {
+        sheet.getRange(i + 1, 9).setValue("✅");
+        success++;
+      } else {
+        sheet.getRange(i + 1, 9).setValue("❌ " + result.message);
+        fail++;
+      }
+
+    } catch (e) {
+
+      sheet.getRange(i + 1, 9).setValue("❌ " + e.message);
+      fail++;
+
+    }
+
+  }
+
+  SpreadsheetApp.getUi().alert(
+    "전송 완료\n\n성공 : " + success + "건\n실패 : " + fail + "건"
+  );
+
+}
+
+/************************************************************
+ * 노션 페이지 생성 객체
+ ************************************************************/
+function createPageObject(row) {
+
+  const title    = text(row[0]);
+  const target   = String(row[1] || "");
+  const date     = formatDate(row[2]);
+  const lesson   = String(row[3] || "");
+  const subject  = String(row[4] || "");
+  const goal     = String(row[5] || "");
+  const contents = String(row[6] || "");
+  const memo     = String(row[7] || "");
+
+  const props = {
+
+    "강의명": {
+      title: [ { text: { content: title } } ]
+    },
+
+    "대상": rich(target),
+    "차시": rich(lesson),
+    "수업주제": rich(subject),
+    "수업목표": rich(goal),
+    "수업내용": rich(contents),
+    "비고": rich(memo),
+
+    "상태": {
+      status: { name: "준비중" }
+    }
+
+  };
+
+  // 날짜가 있을 때만 추가
+  if (date) {
+    props["강의날짜"] = { date: { start: date } };
+  }
+
+  return {
+    parent: { database_id: DATABASE_ID },
+    properties: props,
+    children: createChildren(target, lesson, memo)
+  };
+
+}
+
+/************************************************************
+ * 페이지 본문(children)
+ ************************************************************/
+function createChildren(target, lesson, memo) {
+
+  return [
+
+    {
+      object: "block",
+      type: "callout",
+      callout: {
+        icon: { emoji: "💡" },
+        rich_text: [
+          {
+            type: "text",
+            text: {
+              content:
+                "대상 : " + target +
+                " · 차시 : " + lesson +
+                " · 비고 : " + memo
+            },
+            annotations: {
+              bold: true,
+              italic: false,
+              strikethrough: false,
+              underline: false,
+              code: false,
+              color: "default"
+            }
+          }
+        ]
+      }
+    },
+
+    heading2("🎯 지도안 (도입-전개-정리)"),
+
+    paragraph(""),
+
+    heading2("🧰 준비물 · 체크리스트"),
+
+    {
+      object: "block",
+      type: "to_do",
+      to_do: { rich_text: [], checked: false }
+    },
+
+    heading2("📎 자료 링크"),
+
+    {
+      object: "block",
+      type: "bulleted_list_item",
+      bulleted_list_item: { rich_text: [] }
+    },
+
+    heading2("📝 강의 후 메모"),
+
+    paragraph("")
+
+  ];
+
+}
+
+/************************************************************
+ * 블록 · 속성 도우미
+ ************************************************************/
+function heading2(title) {
+  return {
+    object: "block",
+    type: "heading_2",
+    heading_2: {
+      rich_text: [ { type: "text", text: { content: title } } ]
+    }
+  };
+}
+
+function paragraph(str) {
+  return {
+    object: "block",
+    type: "paragraph",
+    paragraph: {
+      rich_text: [ { type: "text", text: { content: str } } ]
+    }
+  };
+}
+
+function rich(value) {
+  return {
+    rich_text: [
+      { type: "text", text: { content: String(value || "") } }
+    ]
+  };
+}
+
+function text(v) {
+  return String(v || "");
+}
+
+/************************************************************
+ * 날짜 변환
+ * Date 객체 / 2026.9.25 / 2026-9-25 / 2026/9/25 → YYYY-MM-DD
+ ************************************************************/
+function formatDate(value) {
+
+  if (!value) return null;
+
+  if (Object.prototype.toString.call(value) === "[object Date]") {
+    return Utilities.formatDate(value, SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone(), "yyyy-MM-dd");
+  }
+
+  let str = String(value).trim();
+
+  str = str.replace(/[./]/g, "-");
+
+  const m = str.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+
+  if (m) {
+    const y  = m[1];
+    const mm = ("0" + m[2]).slice(-2);
+    const dd = ("0" + m[3]).slice(-2);
+    return y + "-" + mm + "-" + dd;
+  }
+
+  try {
+    const d = new Date(str);
+    if (!isNaN(d)) {
+      return Utilities.formatDate(d, SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone(), "yyyy-MM-dd");
+    }
+  } catch (e) {}
+
+  return null;
+
+}
+
+/************************************************************
+ * 노션 API 호출
+ ************************************************************/
+function callNotion(body) {
+
+  const options = {
+    method: "post",
+    contentType: "application/json",
+    headers: {
+      Authorization: "Bearer " + NOTION_TOKEN,
+      "Notion-Version": "2022-06-28"
+    },
+    payload: JSON.stringify(body),
+    muteHttpExceptions: true
+  };
+
+  const response = UrlFetchApp.fetch("https://api.notion.com/v1/pages", options);
+
+  const code = response.getResponseCode();
+
+  const json = JSON.parse(response.getContentText());
+
+  if (code >= 200 && code < 300) {
+    return { ok: true };
+  }
+
+  return {
+    ok: false,
+    message: json.message || response.getContentText()
+  };
+
+}</textarea>
+    </div>
+
+    <div class="blk">
+      <h3 style="font-size:14px;color:var(--sub);margin:0 0 4px">확인</h3>
+      <ul class="check">
+        <li>저장 → 시트 새로고침 → <b>📤 노션</b> 메뉴 생성</li>
+        <li>실행 → 최초 1회 권한 승인 (고급 → 이동 → 허용)</li>
+        <li>I열에 ✅ · 노션에 페이지 생성</li>
+        <li>페이지 본문에 콜아웃 + 4개 섹션</li>
+        <li>한 번 더 실행 → 아무것도 안 올라감 (중복 방지)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================= v4 ================= -->
+<section id="v4">
+  <div class="card">
+    <h2>시트 연결 실습 흐름</h2>
+    <div class="flow steps">
+      <div class="nd"><b>준비</b><span>API 키 · 시트</span><small>노션 토큰 · DB ID</small></div>
+      <div class="ar">→</div>
+      <div class="nd"><b>v1 기본 전송</b><span>노션에 페이지</span><small>📤 노션으로 보내기</small></div>
+      <div class="ar">→</div>
+      <div class="nd now"><b>v2 스마트 동기화</b><span>J열 ID · 수정</span><small>다시 보내도 중복 없음</small></div>
+      <div class="ar">→</div>
+      <div class="nd"><b>v3 AI 지도안</b><span>🎯 칸 채우기</span><small>🤖 지도안 생성</small></div>
+    </div>
+    <p class="flow-foot">더 해보기 : 선택 전송 · 진행률</p>
+  </div>
+
+  <div class="card">
+    <h2>v2 · 스마트 동기화</h2>
+    <p class="goal">시트를 고쳐서 다시 보내면, 새로 만들지 않고 그 페이지를 수정합니다.</p>
+
+    <div class="note" style="margin-top:0;margin-bottom:16px">
+      <b>먼저 정리</b> — v1으로 노션에 보낸 페이지를 삭제하세요. ID가 없어서 다시 보내면 같은 강의가 두 줄이 됩니다.<br>
+      <b>내 강의 1건 추가</b> — 시트 맨 아래 줄에 내가 수업하고 싶은 강의를 하나 적고 시작합니다. v3에서 이 강의로 지도안을 만듭니다.
+    </div>
+
+    <div class="blk">
+      <div class="blk-head"><h3>프롬프트</h3><button class="copy">복사</button></div>
+      <textarea class="prompt" readonly>기존 Apps Script 코드에 아래 기능을 추가해줘.
+기존 기능은 그대로 유지하고, 수정된 전체 코드를 한 번에 보여줘.
+
+[추가 기능] 스마트 동기화
+
+- J열을 '노션ID' 컬럼으로 사용해줘 (1행 머리글이 없으면 자동으로 만들어줘)
+- 페이지를 새로 만들면 그 페이지 ID를 J열에 기록해줘
+- 다시 실행할 때 J열에 ID가 있으면 새로 만들지 말고
+  PATCH https://api.notion.com/v1/pages/{page_id} 로 기존 페이지의 속성만 업데이트해줘
+- 업데이트 대상 속성 : 강의명, 대상, 강의날짜, 차시, 수업주제, 수업목표, 수업내용, 비고
+- 페이지 본문(children)은 절대 건드리지 말 것   ← 지도안이 지워지면 안 됨
+- '상태'는 새로 만들 때만 '준비중'으로 설정하고, 수정할 때는 건드리지 말 것
+- 결과를 I열에 기록 : 새로 만들면 "✅ 생성", 수정하면 "♻️ 수정"
+- 기존의 "I열에 ✅ 있으면 건너뛰기" 로직은 제거해줘
+  (이제 중복 방지는 J열 ID가 담당함)
+- 노션에서 페이지를 지운 뒤 다시 보내서 ID가 유효하지 않거나(404),
+  휴지통에 있는 페이지라 'archived' 오류(400)가 오면,
+  에러로 끝내지 말고 새 페이지를 만들고 J열 ID를 갱신해줘
+- 완료 알림에 생성 / 수정 / 실패 / 건너뜀 건수를 각각 표시해줘</textarea>
+    </div>
+
+    <div class="blk">
+      <div class="blk-head"><h3>완성 코드 — 전체 교체</h3><button class="copy">복사</button></div>
+      <textarea class="code" readonly>/************************************************************
+ * 이 3줄만 수정하세요
+ ************************************************************/
+const NOTION_TOKEN = "ntn_여기에_토큰";
+const DATABASE_ID  = "여기에_32자리_ID";
+const SHEET_NAME   = "강의목록";
+
+/************************************************************
+ * 메뉴 생성
+ ************************************************************/
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu("📤 노션")
+    .addItem("노션으로 보내기", "sendToNotion")
+    .addItem("선택한 행만 보내기", "sendSelectedToNotion")
+    .addToUi();
+}
+
+/************************************************************
+ * 시트 가져오기
+ ************************************************************/
+function getTargetSheet() {
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+
+  if (!sheet) {
+    SpreadsheetApp.getUi().alert("시트를 찾을 수 없습니다 : " + SHEET_NAME);
+    return null;
+  }
+
+  return sheet;
+
+}
+
+/************************************************************
+ * J열(노션ID) 머리글 준비
+ ************************************************************/
+function ensureNotionIdColumn(sheet) {
+
+  const header = String(sheet.getRange(1, 10).getValue()).trim();
+
+  if (!header) {
+    sheet.getRange(1, 10).setValue("노션ID");
+  }
+
+}
+
+/************************************************************
+ * 전체 전송
+ ************************************************************/
+function sendToNotion() {
+
+  const sheet = getTargetSheet();
+  if (!sheet) return;
+
+  ensureNotionIdColumn(sheet);
+
+  const values = sheet.getDataRange().getValues();
+
+  const targets = [];
+  for (let i = 1; i < values.length; i++) {
+    targets.push(i);
+  }
+
+  processRows(sheet, values, targets);
+
+}
+
+/************************************************************
+ * 선택한 행만 전송
+ ************************************************************/
+function sendSelectedToNotion() {
+
+  const ui = SpreadsheetApp.getUi();
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  const sheet = getTargetSheet();
+  if (!sheet) return;
+
+  if (ss.getActiveSheet().getName() !== SHEET_NAME) {
+    ui.alert("'" + SHEET_NAME + "' 시트에서 행을 선택한 뒤 실행하세요.");
+    return;
+  }
+
+  const range = sheet.getActiveRange();
+
+  if (!range) {
+    ui.alert("행을 선택한 뒤 실행하세요.");
+    return;
+  }
+
+  ensureNotionIdColumn(sheet);
+
+  const values = sheet.getDataRange().getValues();
+
+  const startRow = range.getRow();
+  const endRow   = startRow + range.getNumRows() - 1;
+
+  const targets = [];
+
+  for (let r = startRow; r <= endRow; r++) {
+
+    if (r === 1) continue;
+
+    const index = r - 1;
+
+    if (index >= values.length) continue;
+
+    targets.push(index);
+
+  }
+
+  if (targets.length === 0) {
+    ui.alert("행을 선택한 뒤 실행하세요.");
+    return;
+  }
+
+  processRows(sheet, values, targets);
+
+}
+
+/************************************************************
+ * 실제 처리 (생성 · 수정 자동 판단)
+ ************************************************************/
+function processRows(sheet, values, targets) {
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  const total = targets.length;
+
+  let count   = 0;
+  let created = 0;
+  let updated = 0;
+  let fail    = 0;
+  let skip    = 0;
+
+  const failRows = [];
+
+  ss.toast("총 " + total + "건 처리를 시작합니다.", "📤 노션 동기화", 3);
+
+  targets.forEach(function (i) {
+
+    count++;
+
+    const row = values[i];
+
+    const title = String(row[0]).trim();
+
+    if (!title) { skip++; return; }
+
+    const pageId = String(row[9] || "").trim();
+
+    ss.toast(count + " / " + total + " 처리 중 · " + title, "📤 노션 동기화", 10);
+
+    try {
+
+      // ---------- J열에 ID가 있으면 : 수정 ----------
+      if (pageId) {
+
+        const res = updateNotionPage(pageId, row);
+
+        if (res.ok) {
+          sheet.getRange(i + 1, 9).setValue("♻️ 수정");
+          updated++;
+          return;
+        }
+
+        // 노션에서 페이지가 지워진 경우 → 새로 생성
+        if (isNotFound(res)) {
+
+          const newRes = createNotionPage(row);
+
+          if (newRes.ok) {
+            sheet.getRange(i + 1, 9).setValue("✅ 생성");
+            sheet.getRange(i + 1, 10).setValue(newRes.data.id);
+            created++;
+          } else {
+            sheet.getRange(i + 1, 9).setValue("❌ " + newRes.message);
+            fail++;
+            failRows.push(i + 1);
+          }
+
+          return;
+
+        }
+
+        sheet.getRange(i + 1, 9).setValue("❌ " + res.message);
+        fail++;
+        failRows.push(i + 1);
+        return;
+
+      }
+
+      // ---------- ID가 없으면 : 생성 ----------
+      const res = createNotionPage(row);
+
+      if (res.ok) {
+        sheet.getRange(i + 1, 9).setValue("✅ 생성");
+        sheet.getRange(i + 1, 10).setValue(res.data.id);
+        created++;
+      } else {
+        sheet.getRange(i + 1, 9).setValue("❌ " + res.message);
+        fail++;
+        failRows.push(i + 1);
+      }
+
+    } catch (e) {
+
+      sheet.getRange(i + 1, 9).setValue("❌ " + e.message);
+      fail++;
+      failRows.push(i + 1);
+
+    }
+
+  });
+
+  ss.toast(
+    "완료 : 생성 " + created + " · 수정 " + updated + " · 실패 " + fail,
+    "📤 노션 동기화",
+    5
+  );
+
+  let message =
+    "동기화 완료\n\n" +
+    "생성 : "   + created + "건\n" +
+    "수정 : "   + updated + "건\n" +
+    "실패 : "   + fail    + "건\n" +
+    "건너뜀 : " + skip    + "건";
+
+  if (failRows.length > 0) {
+    message += "\n\n실패한 행 : " + failRows.join(", ") + "행";
+  }
+
+  SpreadsheetApp.getUi().alert(message);
+
+}
+
+/************************************************************
+ * 페이지가 없을 때인지 판단
+ ************************************************************/
+function isNotFound(res) {
+
+  if (res.code === 404) return true;
+
+  const msg = String(res.message || "");
+
+  if (msg.indexOf("archived") >= 0) return true;   // 휴지통에 있는 페이지
+
+  return msg.indexOf("Could not find") >= 0;
+
+}
+
+/************************************************************
+ * 노션 : 페이지 생성
+ ************************************************************/
+function createNotionPage(row) {
+
+  const body = {
+    parent: { database_id: DATABASE_ID },
+    properties: createProperties(row, true),
+    children: createChildren(
+      String(row[1] || ""),
+      String(row[3] || ""),
+      String(row[7] || "")
+    )
+  };
+
+  return callNotionApi("https://api.notion.com/v1/pages", "post", body);
+
+}
+
+/************************************************************
+ * 노션 : 페이지 수정 (속성만, 본문은 건드리지 않음)
+ ************************************************************/
+function updateNotionPage(pageId, row) {
+
+  const body = { properties: createProperties(row, false) };
+
+  return callNotionApi("https://api.notion.com/v1/pages/" + pageId, "patch", body);
+
+}
+
+/************************************************************
+ * 속성 만들기 (생성 · 수정 공용)
+ ************************************************************/
+function createProperties(row, isCreate) {
+
+  const title    = text(row[0]);
+  const target   = String(row[1] || "");
+  const date     = formatDate(row[2]);
+  const lesson   = String(row[3] || "");
+  const subject  = String(row[4] || "");
+  const goal     = String(row[5] || "");
+  const contents = String(row[6] || "");
+  const memo     = String(row[7] || "");
+
+  const props = {
+
+    "강의명": {
+      title: [ { text: { content: title } } ]
+    },
+
+    "대상": rich(target),
+    "차시": rich(lesson),
+    "수업주제": rich(subject),
+    "수업목표": rich(goal),
+    "수업내용": rich(contents),
+    "비고": rich(memo)
+
+  };
+
+  if (date) {
+    props["강의날짜"] = { date: { start: date } };
+  }
+
+  // 새로 만들 때만 상태 지정
+  // (수정할 때 넣으면 노션에서 바꿔둔 상태가 되돌아감)
+  if (isCreate) {
+    props["상태"] = { status: { name: "준비중" } };
+  }
+
+  return props;
+
+}
+
+/************************************************************
+ * 페이지 본문(children)  ※ 생성할 때만 사용
+ ************************************************************/
+function createChildren(target, lesson, memo) {
+
+  return [
+
+    {
+      object: "block",
+      type: "callout",
+      callout: {
+        icon: { emoji: "💡" },
+        rich_text: [
+          {
+            type: "text",
+            text: {
+              content:
+                "대상 : " + target +
+                " · 차시 : " + lesson +
+                " · 비고 : " + memo
+            },
+            annotations: {
+              bold: true,
+              italic: false,
+              strikethrough: false,
+              underline: false,
+              code: false,
+              color: "default"
+            }
+          }
+        ]
+      }
+    },
+
+    heading2("🎯 지도안 (도입-전개-정리)"),
+
+    paragraph(""),
+
+    heading2("🧰 준비물 · 체크리스트"),
+
+    {
+      object: "block",
+      type: "to_do",
+      to_do: { rich_text: [], checked: false }
+    },
+
+    heading2("📎 자료 링크"),
+
+    {
+      object: "block",
+      type: "bulleted_list_item",
+      bulleted_list_item: { rich_text: [] }
+    },
+
+    heading2("📝 강의 후 메모"),
+
+    paragraph("")
+
+  ];
+
+}
+
+/************************************************************
+ * 블록 · 속성 도우미
+ ************************************************************/
+function heading2(title) {
+  return {
+    object: "block",
+    type: "heading_2",
+    heading_2: {
+      rich_text: [ { type: "text", text: { content: title } } ]
+    }
+  };
+}
+
+function paragraph(str) {
+  return {
+    object: "block",
+    type: "paragraph",
+    paragraph: {
+      rich_text: [ { type: "text", text: { content: str } } ]
+    }
+  };
+}
+
+function rich(value) {
+  return {
+    rich_text: [
+      { type: "text", text: { content: String(value || "") } }
+    ]
+  };
+}
+
+function text(v) {
+  return String(v || "");
+}
+
+/************************************************************
+ * 날짜 변환
+ ************************************************************/
+function formatDate(value) {
+
+  if (!value) return null;
+
+  if (Object.prototype.toString.call(value) === "[object Date]") {
+    return Utilities.formatDate(value, SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone(), "yyyy-MM-dd");
+  }
+
+  let str = String(value).trim();
+
+  str = str.replace(/[./]/g, "-");
+
+  const m = str.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+
+  if (m) {
+    const y  = m[1];
+    const mm = ("0" + m[2]).slice(-2);
+    const dd = ("0" + m[3]).slice(-2);
+    return y + "-" + mm + "-" + dd;
+  }
+
+  try {
+    const d = new Date(str);
+    if (!isNaN(d)) {
+      return Utilities.formatDate(d, SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone(), "yyyy-MM-dd");
+    }
+  } catch (e) {}
+
+  return null;
+
+}
+
+/************************************************************
+ * 노션 API 호출 (생성 · 수정 공용)
+ ************************************************************/
+function callNotionApi(url, method, body) {
+
+  const options = {
+    method: method,
+    contentType: "application/json",
+    headers: {
+      Authorization: "Bearer " + NOTION_TOKEN,
+      "Notion-Version": "2022-06-28"
+    },
+    payload: JSON.stringify(body),
+    muteHttpExceptions: true
+  };
+
+  const response = UrlFetchApp.fetch(url, options);
+
+  const code = response.getResponseCode();
+
+  let json = {};
+
+  try { json = JSON.parse(response.getContentText()); } catch (e) {}
+
+  if (code >= 200 && code < 300) {
+    return { ok: true, code: code, data: json };
+  }
+
+  return {
+    ok: false,
+    code: code,
+    message: json.message || response.getContentText()
+  };
+
+}</textarea>
+    </div>
+
+    <div class="blk">
+      <h3 style="font-size:14px;color:var(--sub);margin:0 0 4px">확인</h3>
+      <ul class="check">
+        <li>전송 → I열 <b>✅ 생성</b> · J열에 32자리 ID</li>
+        <li>시트에서 수업주제를 고치고 재전송 → I열 <b>♻️ 수정</b></li>
+        <li>노션에 <b>새 페이지가 안 생기고</b> 내용만 바뀜</li>
+        <li>노션 페이지 본문에 글을 써두고 재전송 → 본문 그대로 남음</li>
+        <li>노션에서 페이지 삭제 후 재전송 → 에러 없이 다시 생성</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================= 더 해보기 ================= -->
+<section id="extra">
+  <div class="guide">
+    <b>선택한 행만 보내기</b> · <b>진행률 표시</b> 기능도 추가할 수 있습니다.<br>
+    <b>v2 완성 코드를 쓴 분은 두 기능이 이미 들어 있습니다.</b> 프롬프트로 직접 만든 분은 아래 프롬프트로 추가해 보세요.
+  </div>
+
+  <div class="card">
+    <h2>선택한 행만 보내기</h2>
+    <p class="goal">필요한 행만 골라서 보냅니다.</p>
+    <div class="blk">
+      <div class="blk-head"><h3>프롬프트</h3><button class="copy">복사</button></div>
+      <textarea class="prompt" readonly>기존 Apps Script 코드에 아래 기능을 추가해줘.
+기존 기능은 그대로 유지하고, 수정된 전체 코드를 한 번에 보여줘.
+
+[추가 기능] 선택한 행만 전송
+
+- '📤 노션' 메뉴에 '선택한 행만 보내기' 항목을 추가해줘
+- 시트에서 마우스로 선택한 범위에 포함된 행만 전송해줘
+- 선택 범위에 1행(머리글)이 포함되면 머리글은 제외하고 처리해줘
+- 선택된 데이터 행이 없으면 "행을 선택한 뒤 실행하세요" 알림을 띄우고 종료
+- 기존 '노션으로 보내기'(전체 전송)는 그대로 유지해줘
+- 두 기능이 같은 전송 함수를 함께 쓰도록 정리해줘</textarea>
+    </div>
+    <div class="blk">
+      <h3 style="font-size:14px;color:var(--sub);margin:0 0 4px">확인</h3>
+      <ul class="check">
+        <li>시트 새로고침 → 메뉴에 '선택한 행만 보내기' 추가</li>
+        <li>한 행만 선택 → 그 건만 전송</li>
+        <li>머리글 포함해서 선택 → 머리글은 무시</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>진행률 표시</h2>
+    <p class="goal">지금 몇 건째인지 화면 오른쪽 아래에 보여줍니다.</p>
+    <div class="blk">
+      <div class="blk-head"><h3>프롬프트</h3><button class="copy">복사</button></div>
+      <textarea class="prompt" readonly>기존 Apps Script 코드에 아래 기능을 추가해줘.
+기존 기능은 그대로 유지하고, 수정된 전체 코드를 한 번에 보여줘.
+
+[추가 기능] 전송 진행률 표시
+
+- 시작할 때 "총 N건 전송을 시작합니다" 토스트를 표시해줘
+- 한 건 보낼 때마다 "3 / 10 전송 중 · AI 시민리더" 형태로 토스트를 갱신해줘
+- 토스트는 SpreadsheetApp.getActiveSpreadsheet().toast() 를 사용해줘
+- 전송이 끝나면 "완료 : 성공 8건 / 실패 2건"을 5초간 토스트로 표시해줘
+- 실패한 행이 있으면 마지막 알림창에 몇 행이 실패했는지 행 번호도 함께 알려줘</textarea>
+    </div>
+    <div class="note">
+      건수가 적으면 오른쪽 아래 알림창이 금방 사라집니다. 행이 많을 때 잘 보입니다.
+    </div>
+  </div>
+</section>
+
+
+<!-- ================= AI 지도안 · 준비 ================= -->
+<section id="ai-prep">
+  <div class="card">
+    <h2>Gemini API 키 준비</h2>
+    <p class="goal">v3에서 지도안을 만들 때 쓰는 키입니다.</p>
+
+    <div class="blk">
+      <ul class="check">
+        <li><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">aistudio.google.com/apikey</a> → API 키 만들기 (결제 수단 불필요)</li>
+        <li>키는 <b>AQ.</b> 로 시작합니다 (2026년 현재 표준)</li>
+        <li>아래 주소를 브라우저에 붙여넣어 키가 살아있는지 확인</li>
+      </ul>
+      <div class="blk-head" style="margin-top:10px"><h3>키 확인용 주소</h3><button class="copy">복사</button></div>
+      <textarea class="short" style="height:60px" readonly>https://generativelanguage.googleapis.com/v1beta/models?key=발급받은키</textarea>
+      <p class="goal" style="margin-top:8px">JSON 목록이 뜨면 정상입니다. 모델은 <b>gemini-flash-lite-latest</b> 를 사용합니다.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ================= v5 ================= -->
+<section id="v5">
+  <div class="card">
+    <h2>시트 연결 실습 흐름</h2>
+    <div class="flow steps">
+      <div class="nd"><b>준비</b><span>API 키 · 시트</span><small>노션 토큰 · DB ID</small></div>
+      <div class="ar">→</div>
+      <div class="nd"><b>v1 기본 전송</b><span>노션에 페이지</span><small>📤 노션으로 보내기</small></div>
+      <div class="ar">→</div>
+      <div class="nd"><b>v2 스마트 동기화</b><span>J열 ID · 수정</span><small>다시 보내도 중복 없음</small></div>
+      <div class="ar">→</div>
+      <div class="nd now"><b>v3 AI 지도안</b><span>🎯 칸 채우기</span><small>🤖 지도안 생성</small></div>
+    </div>
+    <p class="flow-foot">더 해보기 : 선택 전송 · 진행률</p>
+  </div>
+
+  <div class="card">
+    <h2>v3 · AI 지도안 생성</h2>
+    <p class="goal">노션 페이지의 🎯 지도안 칸을 AI가 채웁니다.</p>
+
+    <div class="blk">
+      <div class="blk-head"><h3>프롬프트</h3><button class="copy">복사</button></div>
+      <textarea class="prompt" readonly>기존 Apps Script 코드에 아래 기능을 추가해줘.
+기존 기능은 그대로 유지하고, 추가되는 부분만 보여줘.
+
+[추가 기능] AI 지도안 생성
+
+- 상단에 GEMINI_API_KEY, GEMINI_MODEL 상수를 추가해줘
+  (모델은 gemini-flash-lite-latest)
+- '📤 노션' 메뉴에 '🤖 지도안 생성'과 '🤖 선택한 행 지도안 생성' 항목을 추가해줘
+- 시트 J열의 노션 페이지 ID를 사용해줘 (ID가 없는 행은 건너뜀)
+- GET https://api.notion.com/v1/blocks/{page_id}/children 로 페이지 본문을 읽고,
+  "🎯 지도안"이 들어간 heading_2 블록을 찾아줘
+- 그 헤딩 바로 다음 블록이 내용이 있는 블록이면 이미 생성된 것으로 보고 건너뛰어줘
+- 비어 있으면 Gemini API를 호출해서 지도안을 생성해줘
+  POST https://generativelanguage.googleapis.com/v1beta/models/{모델}:generateContent?key={키}
+- 받은 결과를 PATCH https://api.notion.com/v1/blocks/{page_id}/children 로
+  after 옵션을 써서 "🎯 지도안" 헤딩 바로 아래에 삽입해줘
+- 결과 변환 규칙 : "## "로 시작하면 heading_3, "- "로 시작하면 bulleted_list_item,
+  나머지는 paragraph. 빈 줄은 무시. ** 기호는 제거
+- 한 번에 보낼 수 있는 블록은 100개까지이므로 넘으면 잘라줘
+- 무료 등급 분당 요청 제한을 피하려고 한 건 처리 후 4초 쉬어줘
+- 429 응답이 오면 20초 기다렸다가 한 번만 재시도해줘
+- 진행률은 toast로 표시하고, 완료 후 생성 / 건너뜀 / 실패 건수를 알림창으로 보여줘
+- 지도안 생성 프롬프트는 buildLessonPrompt(row) 함수로 분리하고,
+  아래 [코드 안에 들어갈 AI 프롬프트]를 그대로 코드 안에 넣어줘
+
+
+[코드 안에 들어갈 AI 프롬프트]
+
+"너는 교육과정 재구성 전문가야.
+아래 [강의 정보]를 바탕으로 90분 기준 교수·학습 과정안(지도안)을 작성해줘.
+
+[강의 정보]  ← 시트의 각 열 값을 넣을 것
+강의명 : A열
+대상 : B열
+차시 : D열
+수업주제 : E열
+수업목표 : F열
+수업내용 : G열
+수업조건 : H열(비고)
+
+[작성 규칙]
+- 구성 : 도입(10분) / 전개1(30분) / 전개2(40분) / 정리(10분)
+- 각 단계는 아래 세 줄로만 작성하고, 세 줄을 넘기지 말 것
+  · 활동 : 무엇을 하는지 한 문장
+  · 발화 : 강사가 실제로 할 말 한 문장 (구어체)
+  · 유의 : 놓치기 쉬운 것 한 문장
+- 핵심 발문 2개
+- 준비물 4개 이내
+- 시간이 부족할 때 줄일 활동 1개
+- [수업조건]에 인원·환경·수준·제약이 있으면 반드시 반영할 것
+- 전체 분량은 A4 한 장 이내
+- 수사나 설명 없이 현장에서 바로 읽는 문장으로 쓸 것
+- 같은 내용을 다른 말로 반복하지 말 것
+
+[출력 형식]  아래 기호만 사용할 것
+- 소제목은 '## '로 시작
+- 항목은 '- '로 시작
+- 표, 코드블록, ** 강조 기호는 절대 사용하지 말 것
+- 반드시 한국어로만 작성하고 한자·중국어·일본어는 섞지 말 것"</textarea>
+    </div>
+
+    <div class="blk">
+      <div class="blk-head"><h3>① 맨 위 상수에 2줄 추가</h3><button class="copy">복사</button></div>
+      <textarea class="short" style="height:80px" readonly>const GEMINI_API_KEY = "AQ.여기에_제미나이_키";
+const GEMINI_MODEL   = "gemini-flash-lite-latest";</textarea>
+    </div>
+
+    <div class="blk">
+      <div class="blk-head"><h3>② onOpen 교체</h3><button class="copy">복사</button></div>
+      <textarea class="short" readonly>function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu("📤 노션")
+    .addItem("노션으로 보내기", "sendToNotion")
+    .addItem("선택한 행만 보내기", "sendSelectedToNotion")
+    .addSeparator()
+    .addItem("🤖 지도안 생성", "generateLessonPlans")
+    .addItem("🤖 선택한 행 지도안 생성", "generateSelectedLessonPlans")
+    .addToUi();
+}</textarea>
+    </div>
+
+    <div class="blk">
+      <div class="blk-head"><h3>③ 파일 맨 끝에 붙여넣기</h3><button class="copy">복사</button></div>
+      <textarea class="code" readonly>/************************************************************
+ * ===========  AI 지도안 생성  ===========
+ ************************************************************/
+
+/************************************************************
+ * 전체 지도안 생성
+ ************************************************************/
+function generateLessonPlans() {
+
+  const sheet = getTargetSheet();
+  if (!sheet) return;
+
+  const values = sheet.getDataRange().getValues();
+
+  const targets = [];
+  for (let i = 1; i < values.length; i++) {
+    targets.push(i);
+  }
+
+  runLessonPlan(sheet, values, targets);
+
+}
+
+/************************************************************
+ * 선택한 행만 지도안 생성
+ ************************************************************/
+function generateSelectedLessonPlans() {
+
+  const ui = SpreadsheetApp.getUi();
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  const sheet = getTargetSheet();
+  if (!sheet) return;
+
+  if (ss.getActiveSheet().getName() !== SHEET_NAME) {
+    ui.alert("'" + SHEET_NAME + "' 시트에서 행을 선택한 뒤 실행하세요.");
+    return;
+  }
+
+  const range = sheet.getActiveRange();
+
+  if (!range) {
+    ui.alert("행을 선택한 뒤 실행하세요.");
+    return;
+  }
+
+  const values = sheet.getDataRange().getValues();
+
+  const startRow = range.getRow();
+  const endRow   = startRow + range.getNumRows() - 1;
+
+  const targets = [];
+
+  for (let r = startRow; r <= endRow; r++) {
+    if (r === 1) continue;
+    const index = r - 1;
+    if (index >= values.length) continue;
+    targets.push(index);
+  }
+
+  if (targets.length === 0) {
+    ui.alert("행을 선택한 뒤 실행하세요.");
+    return;
+  }
+
+  runLessonPlan(sheet, values, targets);
+
+}
+
+/************************************************************
+ * 지도안 생성 처리
+ ************************************************************/
+function runLessonPlan(sheet, values, targets) {
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  const total = targets.length;
+
+  let count   = 0;
+  let created = 0;
+  let skip    = 0;
+  let fail    = 0;
+
+  const failRows = [];
+
+  ss.toast("총 " + total + "건 확인을 시작합니다.", "🤖 지도안 생성", 3);
+
+  targets.forEach(function (i) {
+
+    count++;
+
+    const row    = values[i];
+    const title  = String(row[0]).trim();
+    const pageId = String(row[9] || "").trim();
+
+    // 강의명 없거나 노션에 안 올라간 행은 건너뜀
+    if (!title || !pageId) { skip++; return; }
+
+    ss.toast(count + " / " + total + " · " + title, "🤖 지도안 생성", 30);
+
+    try {
+
+      // 1. 페이지 본문 읽기
+      const blocks = getPageBlocks(pageId);
+
+      if (!blocks.ok) {
+        sheet.getRange(i + 1, 9).setValue("❌ " + blocks.message);
+        fail++;
+        failRows.push(i + 1);
+        return;
+      }
+
+      // 2. '🎯 지도안' 헤딩 찾기
+      const list  = blocks.data.results || [];
+      const index = findLessonPlanHeading(list);
+
+      if (index < 0) {
+        sheet.getRange(i + 1, 9).setValue("❌ 지도안 헤딩 없음");
+        fail++;
+        failRows.push(i + 1);
+        return;
+      }
+
+      // 3. 이미 내용이 있으면 건너뜀
+      if (hasContentAfter(list, index)) { skip++; return; }
+
+      // 4. Gemini 호출
+      const result = callGemini(buildLessonPrompt(row));
+
+      if (!result.ok) {
+        sheet.getRange(i + 1, 9).setValue("❌ AI: " + result.message);
+        fail++;
+        failRows.push(i + 1);
+        return;
+      }
+
+      // 5. 노션에 삽입
+      const insert = appendBlocksAfter(
+        pageId,
+        list[index].id,
+        textToBlocks(result.text)
+      );
+
+      if (insert.ok) {
+        sheet.getRange(i + 1, 9).setValue("🤖 지도안 완료");
+        created++;
+      } else {
+        sheet.getRange(i + 1, 9).setValue("❌ " + insert.message);
+        fail++;
+        failRows.push(i + 1);
+      }
+
+      SpreadsheetApp.flush();
+      Utilities.sleep(4000);
+
+    } catch (e) {
+
+      sheet.getRange(i + 1, 9).setValue("❌ " + e.message);
+      fail++;
+      failRows.push(i + 1);
+
+    }
+
+  });
+
+  ss.toast(
+    "완료 : 생성 " + created + " · 건너뜀 " + skip + " · 실패 " + fail,
+    "🤖 지도안 생성",
+    5
+  );
+
+  let message =
+    "지도안 생성 완료\n\n" +
+    "생성 : "   + created + "건\n" +
+    "건너뜀 : " + skip    + "건\n" +
+    "실패 : "   + fail    + "건";
+
+  if (failRows.length > 0) {
+    message += "\n\n실패한 행 : " + failRows.join(", ") + "행";
+  }
+
+  SpreadsheetApp.getUi().alert(message);
+
+}
+
+/************************************************************
+ * 노션 : 페이지 본문 블록 읽기
+ ************************************************************/
+function getPageBlocks(pageId) {
+
+  const url = "https://api.notion.com/v1/blocks/" + pageId + "/children?page_size=100";
+
+  const options = {
+    method: "get",
+    headers: {
+      Authorization: "Bearer " + NOTION_TOKEN,
+      "Notion-Version": "2022-06-28"
+    },
+    muteHttpExceptions: true
+  };
+
+  const response = UrlFetchApp.fetch(url, options);
+  const code     = response.getResponseCode();
+
+  let json = {};
+  try { json = JSON.parse(response.getContentText()); } catch (e) {}
+
+  if (code >= 200 && code < 300) {
+    return { ok: true, data: json };
+  }
+
+  return { ok: false, message: json.message || response.getContentText() };
+
+}
+
+/************************************************************
+ * '🎯 지도안' 헤딩 위치 찾기
+ ************************************************************/
+function findLessonPlanHeading(list) {
+
+  for (let i = 0; i < list.length; i++) {
+
+    const b = list[i];
+
+    if (b.type !== "heading_2") continue;
+
+    const rt = b.heading_2.rich_text || [];
+
+    let str = "";
+    rt.forEach(function (t) { str += t.plain_text || ""; });
+
+    if (str.indexOf("지도안") >= 0) return i;
+
+  }
+
+  return -1;
+
+}
+
+/************************************************************
+ * 헤딩 다음 블록에 내용이 있는지 확인
+ ************************************************************/
+function hasContentAfter(list, index) {
+
+  const next = list[index + 1];
+
+  if (!next) return false;
+
+  if (next.type === "heading_2") return false;
+
+  const body = next[next.type];
+
+  if (!body || !body.rich_text) return false;
+
+  let str = "";
+  body.rich_text.forEach(function (t) { str += t.plain_text || ""; });
+
+  return str.trim().length > 0;
+
+}
+
+/************************************************************
+ * 노션 : 특정 블록 뒤에 블록 추가
+ ************************************************************/
+function appendBlocksAfter(pageId, afterBlockId, children) {
+
+  if (children.length === 0) {
+    return { ok: false, message: "생성된 내용이 없습니다." };
+  }
+
+  const list = children.slice(0, 100);   // 한 번에 100개까지
+
+  const url = "https://api.notion.com/v1/blocks/" + pageId + "/children";
+
+  const options = {
+    method: "patch",
+    contentType: "application/json",
+    headers: {
+      Authorization: "Bearer " + NOTION_TOKEN,
+      "Notion-Version": "2022-06-28"
+    },
+    payload: JSON.stringify({ children: list, after: afterBlockId }),
+    muteHttpExceptions: true
+  };
+
+  const response = UrlFetchApp.fetch(url, options);
+  const code     = response.getResponseCode();
+
+  let json = {};
+  try { json = JSON.parse(response.getContentText()); } catch (e) {}
+
+  if (code >= 200 && code < 300) {
+    return { ok: true };
+  }
+
+  return { ok: false, message: json.message || response.getContentText() };
+
+}
+
+/************************************************************
+ * 지도안 프롬프트 만들기
+ * ※ 이 부분을 고치면 지도안 스타일이 바뀝니다
+ ************************************************************/
+function buildLessonPrompt(row) {
+
+  const title    = String(row[0] || "");
+  const target   = String(row[1] || "");
+  const lesson   = String(row[3] || "");
+  const subject  = String(row[4] || "");
+  const goal     = String(row[5] || "");
+  const contents = String(row[6] || "");
+  const memo     = String(row[7] || "");
+
+  return [
+    "너는 교육과정 재구성 전문가야.",
+    "아래 [강의 정보]를 바탕으로 90분 기준 교수·학습 과정안(지도안)을 작성해줘.",
+    "",
+    "[강의 정보]",
+    "강의명 : "   + title,
+    "대상 : "     + target,
+    "차시 : "     + lesson,
+    "수업주제 : " + subject,
+    "수업목표 : " + goal,
+    "수업내용 : " + contents,
+    "수업조건 : " + memo,
+    "",
+    "[작성 규칙]",
+    "- 구성 : 도입(10분) / 전개1(30분) / 전개2(40분) / 정리(10분)",
+    "- 각 단계는 아래 세 줄로만 작성하고, 세 줄을 넘기지 말 것",
+    "  · 활동 : 무엇을 하는지 한 문장",
+    "  · 발화 : 강사가 실제로 할 말 한 문장 (구어체)",
+    "  · 유의 : 놓치기 쉬운 것 한 문장",
+    "- 핵심 발문 2개",
+    "- 준비물 4개 이내",
+    "- 시간이 부족할 때 줄일 활동 1개",
+    "- [수업조건]에 인원·환경·수준·제약이 있으면 반드시 반영할 것",
+    "- 전체 분량은 A4 한 장 이내",
+    "- 수사나 설명 없이 현장에서 바로 읽는 문장으로 쓸 것",
+    "- 같은 내용을 다른 말로 반복하지 말 것",
+    "",
+    "[출력 형식]  아래 기호만 사용할 것",
+    "- 소제목은 '## '로 시작",
+    "- 항목은 '- '로 시작",
+    "- 표, 코드블록, ** 강조 기호는 절대 사용하지 말 것",
+    "- 반드시 한국어로만 작성하고 한자·중국어·일본어는 섞지 말 것"
+  ].join("\n");
+
+}
+
+/************************************************************
+ * Gemini 호출
+ ************************************************************/
+function callGemini(prompt, isRetry) {
+
+  const url =
+    "https://generativelanguage.googleapis.com/v1beta/models/" +
+    GEMINI_MODEL + ":generateContent?key=" + GEMINI_API_KEY;
+
+  const options = {
+    method: "post",
+    contentType: "application/json",
+    payload: JSON.stringify({
+      contents: [ { parts: [ { text: prompt } ] } ]
+    }),
+    muteHttpExceptions: true
+  };
+
+  const response = UrlFetchApp.fetch(url, options);
+  const code     = response.getResponseCode();
+
+  let json = {};
+  try { json = JSON.parse(response.getContentText()); } catch (e) {}
+
+  // 요청 과다 → 20초 후 1회 재시도
+  if (code === 429 && !isRetry) {
+    Utilities.sleep(20000);
+    return callGemini(prompt, true);
+  }
+
+  if (code < 200 || code >= 300) {
+    return {
+      ok: false,
+      message: (json.error && json.error.message) || response.getContentText()
+    };
+  }
+
+  let out = "";
+
+  try {
+    const parts = json.candidates[0].content.parts || [];
+    parts.forEach(function (p) { if (p.text) out += p.text; });
+  } catch (e) {
+    return { ok: false, message: "응답 형식을 읽을 수 없습니다." };
+  }
+
+  if (!out.trim()) {
+    return { ok: false, message: "빈 응답" };
+  }
+
+  return { ok: true, text: out };
+
+}
+
+/************************************************************
+ * AI 응답 텍스트 → 노션 블록
+ ************************************************************/
+function textToBlocks(str) {
+
+  const lines  = String(str).split("\n");
+  const blocks = [];
+
+  lines.forEach(function (raw) {
+
+    let line = raw.replace(/\*\*/g, "").trim();
+
+    if (!line) return;
+
+    // ## 소제목
+    if (line.indexOf("## ") === 0) {
+      blocks.push({
+        object: "block",
+        type: "heading_3",
+        heading_3: {
+          rich_text: [
+            { type: "text", text: { content: line.substring(3, 1900).trim() } }
+          ]
+        }
+      });
+      return;
+    }
+
+    // - 항목
+    if (line.indexOf("- ") === 0) {
+      blocks.push({
+        object: "block",
+        type: "bulleted_list_item",
+        bulleted_list_item: {
+          rich_text: [
+            { type: "text", text: { content: line.substring(2, 1900).trim() } }
+          ]
+        }
+      });
+      return;
+    }
+
+    // 일반 문단
+    blocks.push({
+      object: "block",
+      type: "paragraph",
+      paragraph: {
+        rich_text: [
+          { type: "text", text: { content: line.substring(0, 1900) } }
+        ]
+      }
+    });
+
+  });
+
+  return blocks;
+
+}
+
+/************************************************************
+ * (선택) 키 연결 테스트 — 편집기에서 직접 실행
+ ************************************************************/
+function testGemini() {
+  const r = callGemini("안녕하세요 라고만 답해줘.");
+  Logger.log(JSON.stringify(r));
+}</textarea>
+    </div>
+
+    <div class="blk">
+      <h3 style="font-size:14px;color:var(--sub);margin:0 0 4px">확인</h3>
+      <ul class="check">
+        <li>저장 → 시트 새로고침 → 🤖 메뉴 2개</li>
+        <li><b>내 강의 1건만 선택</b>해서 실행 (20~40초 소요)</li>
+        <li>I열 <b>🤖 지도안 완료</b></li>
+        <li>노션에서 🎯 지도안 바로 아래에 내용 삽입</li>
+        <li>준비물 · 자료 링크 · 강의 후 메모 섹션은 그대로</li>
+        <li>같은 행 재실행 → 건너뜀 1건</li>
+        <li>노션으로 보내기 재전송 → <b>지도안이 지워지지 않음</b></li>
+      </ul>
+    </div>
+
+    <div class="note">
+      <b>좋은 지도안이 나오려면</b><br>
+      대상 : "성인" → <b>"성인 직장인 (AI 도구 처음)"</b><br>
+      비고 : <b>인원 / 환경 / 제약</b> — 예) 12명 / 태블릿 / 와이파이 불안정
+    </div>
+
+    <div class="guide" style="margin:16px 0 0">
+      <b>시간이 남으면</b> — 내 강의의 비고를 바꿔 한 번 더 만들어 보세요. 인원 · 환경이 달라지면 지도안이 어떻게 바뀌는지 비교할 수 있습니다.
+    </div>
+  </div>
+</section>
+
+
+<!-- ================= 문제 해결 ================= -->
+<section id="fix">
+  <div class="card">
+    <h2>안 될 때 확인할 5가지</h2>
+    <ol style="font-size:14.5px; padding-left:20px; margin:10px 0 0">
+      <li>DB에 API 연결(⋯ → 연결)을 추가했는가?</li>
+      <li>속성 이름 = 시트 머리글 = 코드 문자열, 셋 다 똑같은가?</li>
+      <li>강의날짜는 YYYY-MM-DD 인가?</li>
+      <li>차시는 '텍스트' 타입인가? (숫자 ❌)</li>
+      <li>수식(D-day) 속성을 코드가 건드리고 있지 않은가?</li>
+    </ol>
+    <div class="note">
+      I열의 <b>❌ 메시지를 그대로 복사</b>해서 AI에게 붙여넣으세요. 대부분 바로 고쳐집니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>자주 나오는 증상</h2>
+    <table>
+      <tr><th>증상</th><th>원인</th><th>해결</th></tr>
+      <tr><td>메뉴가 안 보임</td><td>onOpen은 시트를 열 때만 실행됨</td><td>시트 새로고침 (F5)</td></tr>
+      <tr><td>빨간 밑줄 · 코드 전체가 안 읽힘</td><td>쉼표 누락</td><td>빨간 줄의 <b>윗줄 끝</b> 확인</td></tr>
+      <tr><td>Could not find database</td><td>DB에 API 연결 없음 / ID 오타</td><td>⋯ → 연결 추가</td></tr>
+      <tr><td>is not a property that exists</td><td>속성 이름 불일치</td><td>노션 속성명과 코드 대조</td></tr>
+      <tr><td>❌ 지도안 헤딩 없음</td><td>버튼·템플릿으로 만든 페이지</td><td>시트에서 전송한 행으로 실행</td></tr>
+      <tr><td>고쳤는데 결과가 그대로</td><td>기존 노션 페이지는 옛 구조</td><td>페이지 삭제 + I·J열 비우고 재생성</td></tr>
+      <tr><td>❌ Can't edit block that is archived</td><td>노션에서 지운 페이지(휴지통)의 ID가 J열에 남아 있음</td><td>❌ 메시지를 AI에게 붙여 <b>"새 페이지를 만들게 고쳐줘"</b></td></tr>
+      <tr><td>건너뜀만 나옴</td><td>J열에 ID 없음</td><td>노션으로 보내기 먼저 실행</td></tr>
+      <tr><td>너무 오래 걸림</td><td>AI가 긴 글을 쓰는 중</td><td><b>정상</b> — 건당 20~40초</td></tr>
+      <tr><td>❌ 503 high demand</td><td>구글 서버 혼잡 (내 잘못 아님)</td><td>1분 뒤 재실행 → 안 되면 <code class="kbd">GEMINI_MODEL</code> 을 <code class="kbd">gemini-flash-latest</code> 로 바꿔 보기 → 그래도 안 되면 아래 <b>Groq로 바꾸기</b></td></tr>
+      <tr><td>❌ 403 free tier is not available</td><td>이 계정의 프로젝트는 Gemini 무료 사용 불가 (키를 새로 만들어도 같음 · 계정마다 다름)</td><td><b>다른 Gmail 계정</b>으로 키 발급 · 또는 아래 <b>Groq로 바꾸기</b></td></tr>
+      <tr><td>❌ AI: 429</td><td>분당 요청 제한</td><td>잠시 후 재실행</td></tr>
+      <tr><td>INTERNAL 오류</td><td>여러 건을 한 번에 실행</td><td><b>다시 실행</b> — 만든 건 건너뛰고 이어서 처리</td></tr>
+    </table>
+  </div>
+
+  <details class="card fold">
+    <summary>
+      <h2>Gemini가 계속 안 될 때 — Groq로 바꾸기</h2>
+      <p class="goal">503(서버 혼잡)이 나서 <b>다른 Gemini 모델(gemini-flash-latest)로 바꿔도</b> 안 될 때, 또는 <b>403(무료 등급 불가)</b> 이 나면 바로 씁니다.</p>
+    </summary>
+
+    <div class="blk">
+      <h3 style="font-size:14px;color:var(--sub);margin:0 0 4px">Groq 키 발급</h3>
+      <ul class="check">
+        <li><a href="https://console.groq.com/keys" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600">console.groq.com/keys</a> → 가입 → API Key 만들기</li>
+        <li><b>각자 자기 계정</b>으로 발급합니다 — 한도가 계정마다 따로라, 한 키를 나눠 쓰면 바로 막힙니다</li>
+      </ul>
+    </div>
+
+    <div class="blk">
+      <div class="blk-head"><h3>방법 1 · 시간 여유 있을 때 — 내 코드 고치기 (프롬프트)</h3><button class="copy">복사</button></div>
+      <textarea class="autosize" readonly>지도안 생성에서 Gemini가 503(서버 혼잡) 또는 403(무료 등급 불가) 오류로 실패해.
+AI 호출만 Groq로 바꾸고 싶어. 아래 조건대로 고쳐줘.
+
+[바꿀 것]
+- 맨 위에 GROQ_API_KEY, GROQ_MODEL 상수 2줄을 추가해줘
+  (모델은 openai/gpt-oss-120b)
+- Gemini를 부르는 함수의 안쪽만 Groq 방식으로 바꿔줘
+  · 주소 : POST https://api.groq.com/openai/v1/chat/completions
+  · 헤더 : Authorization: Bearer {GROQ_API_KEY}
+  · 보내는 내용 : model, messages: [{ role: "user", content: 프롬프트 }]
+  · 결과 : choices[0].message.content 를 꺼내서 돌려줘
+- Gemini 키가 있는지 확인하는 부분도 GROQ_API_KEY를 확인하도록 바꿔줘
+- 429가 오면 20초 기다렸다가 한 번만 다시 시도해줘
+
+[바꾸지 말 것]
+- 함수 이름과, 이 함수가 돌려주는 값의 모양은 그대로 둘 것
+  (다른 코드가 이 함수를 그대로 부르기 때문)
+- 노션 읽기, 지도안 프롬프트, 노션에 넣는 부분은 건드리지 말 것
+
+바뀐 부분만 보여주고, 어디를 교체하면 되는지 알려줘.</textarea>
+      <p class="goal" style="margin-top:8px">고칠 곳은 세 군데입니다 — <b>상수 2줄 추가 · AI 호출 함수 · 키 확인 부분</b>. 지금까지 쓰던 ChatGPT 대화창에 이어서 붙여 넣으세요.</p>
+    </div>
+
+    <details class="fold-sub blk">
+      <summary><h3>방법 2 · 시간이 촉박할 때 — 완성 코드로 전체 교체</h3></summary>
+    <div class="blk" style="margin-top:8px">
+      <div class="blk-head"><h3>완성 코드</h3><button class="copy">복사</button></div>
+      <textarea class="code" readonly>/*************************************************
+ * 구글 시트 → 노션 강의 데이터베이스
+ * 스마트 동기화 (휴지통 오류 대응 버전)
+ *
+ * Notion-Version: 2022-06-28
+ *
+ * A : 강의명
+ * B : 대상
+ * C : 강의날짜
+ * D : 차시
+ * E : 수업주제
+ * F : 수업목표
+ * G : 수업내용
+ * H : 비고
+ * I : 완료 (전송 결과)
+ * J : 노션ID
+ *
+ * [동작]
+ * J열 ID 없음 → 새 페이지 생성
+ * J열 ID 있음 → 기존 페이지 속성 수정
+ * HTTP 404 → 새 페이지 생성
+ * HTTP 400 archived → 새 페이지 생성
+ *
+ * 기존 페이지의 본문(children)은 수정하지 않음
+ * Groq api key를 사용하는 코드임
+ *************************************************/
+
+
+// ================================================
+// ✅ 이 3줄만 수정하세요
+// ================================================
+
+const NOTION_TOKEN = '노션 토큰 키를 넣어주세요';
+const DATABASE_ID = '노션 페이지 ID를 넣어주세요';
+const SHEET_NAME = '강의목록';
+
+
+// ================================================
+// 🤖 Groq AI 설정 (키만 수정하세요)
+// ================================================
+
+const GROQ_API_KEY = '그록 API Key를 넣어주세요';
+const GROQ_MODEL = 'openai/gpt-oss-120b';
+
+
+// ================================================
+// 1. 구글 시트 메뉴 생성
+// ================================================
+
+function onOpen() {
+
+  SpreadsheetApp.getUi()
+    .createMenu('📤 노션')
+    .addItem('노션으로 보내기', 'sendToNotion')
+    .addSeparator()
+    .addItem('🤖 지도안 생성', 'generateAllLessonPlans')
+    .addItem(
+      '🤖 선택한 행 지도안 생성',
+      'generateSelectedLessonPlans'
+    )
+    .addToUi();
+
+}
+
+// ================================================
+// 2. 메인 함수: 스마트 동기화
+// ================================================
+
+function sendToNotion() {
+
+  const ui = SpreadsheetApp.getUi();
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_NAME);
+
+  // 시트 존재 여부 확인
+  if (!sheet) {
+    ui.alert('시트를 찾을 수 없습니다: ' + SHEET_NAME);
+    return;
+  }
+
+  // 필수 설정값 확인
+  if (
+    !NOTION_TOKEN ||
+    !DATABASE_ID ||
+    NOTION_TOKEN === '노션 토큰 키를 넣어주세요' ||
+    DATABASE_ID === '노션 페이지 ID를 넣어주세요'
+  ) {
+    ui.alert('NOTION_TOKEN과 DATABASE_ID를 설정해 주세요.');
+    return;
+  }
+
+  // 동시에 여러 번 실행되는 상황 방지
+  const lock = LockService.getDocumentLock();
+
+  if (!lock.tryLock(1000)) {
+    ui.alert('이미 동기화 작업이 실행 중입니다.');
+    return;
+  }
+
+  // 처리 결과 건수
+  let createdCount = 0;
+  let updatedCount = 0;
+  let failedCount = 0;
+  let skippedCount = 0;
+
+  try {
+
+    // J열 머리글 자동 생성
+    prepareNotionIdColumn(sheet);
+
+    const lastRow = sheet.getLastRow();
+
+    // 데이터가 없는 경우
+    if (lastRow &lt; 2) {
+      ui.alert('동기화할 강의 데이터가 없습니다.');
+      return;
+    }
+
+    // A~J열 데이터 읽기
+    const data = sheet.getRange(
+      2, 1, lastRow - 1, 10
+    ).getValues();
+
+    // 구글 시트의 시간대
+    const timezone = ss.getSpreadsheetTimeZone();
+
+    // 각 행을 순서대로 처리
+    data.forEach((row, index) =&gt; {
+
+      const rowNumber = index + 2;
+
+      // A열: 강의명
+      const lectureName = toText(row[0]);
+
+      // J열: 노션 페이지 ID
+      const notionId = toText(row[9]);
+
+      // 강의명이 없는 행은 건너뛰기
+      if (!lectureName) {
+        skippedCount++;
+        return;
+      }
+
+      try {
+
+        // 시트 데이터를 노션 속성으로 변환
+        const properties = buildProperties(
+          row,
+          timezone
+        );
+
+        // ------------------------------------
+        // J열에 노션ID가 있는 경우
+        // ------------------------------------
+
+        if (notionId) {
+
+          try {
+
+            // 기존 페이지의 속성만 수정
+            updateNotionPage(
+              notionId,
+              properties
+            );
+
+            // 수정 성공
+            sheet.getRange(rowNumber, 9)
+              .setValue('♻️ 수정');
+
+            updatedCount++;
+
+          } catch (error) {
+
+            // 404: 기존 페이지를 찾을 수 없음
+            const isNotFound =
+              error.statusCode === 404;
+
+            // 400: 기존 페이지가 휴지통에 있음
+            const isArchived =
+              error.statusCode === 400 &amp;&amp;
+              /archived|unarchive/i.test(
+                error.message
+              );
+
+            // 404와 archived 오류만 재생성
+            // 나머지 오류는 실패 처리
+            if (!isNotFound &amp;&amp; !isArchived) {
+              throw error;
+            }
+
+            // 기존 페이지 대신 새 페이지 생성
+            const payload = buildNotionPayload(
+              row,
+              properties
+            );
+
+            const newPage = createNotionPage(
+              payload
+            );
+
+            // 새 노션 페이지 ID를 J열에 저장
+            sheet.getRange(rowNumber, 10)
+              .setValue(newPage.id);
+
+            // 결과를 I열에 저장
+            sheet.getRange(rowNumber, 9)
+              .setValue('✅ 생성');
+
+            createdCount++;
+
+          }
+
+        } else {
+
+          // ------------------------------------
+          // J열에 노션ID가 없는 경우
+          // ------------------------------------
+
+          const payload = buildNotionPayload(
+            row,
+            properties
+          );
+
+          // 새 페이지 생성
+          const newPage = createNotionPage(
+            payload
+          );
+
+          // 생성된 페이지 ID를 J열에 기록
+          sheet.getRange(rowNumber, 10)
+            .setValue(newPage.id);
+
+          // 생성 완료 기록
+          sheet.getRange(rowNumber, 9)
+            .setValue('✅ 생성');
+
+          createdCount++;
+
+        }
+
+      } catch (error) {
+
+        // 실패 시 I열에 오류 메시지 기록
+        sheet.getRange(rowNumber, 9)
+          .setValue('❌ ' + error.message);
+
+        failedCount++;
+
+        console.error(
+          rowNumber + '행 전송 실패: ' +
+          error.message
+        );
+
+      }
+
+    });
+
+  } finally {
+
+    // 실행 잠금 해제
+    lock.releaseLock();
+
+  }
+
+  // 최종 결과 알림
+  ui.alert(
+    '노션 스마트 동기화 완료\n\n' +
+    '✅ 생성: ' + createdCount + '건\n' +
+    '♻️ 수정: ' + updatedCount + '건\n' +
+    '❌ 실패: ' + failedCount + '건\n' +
+    '⏭️ 건너뜀: ' + skippedCount + '건'
+  );
+
+}
+
+
+// ================================================
+// 3. J열 노션ID 머리글 자동 생성
+// ================================================
+
+function prepareNotionIdColumn(sheet) {
+
+  const maxColumns = sheet.getMaxColumns();
+
+  // J열이 없다면 열 추가
+  if (maxColumns &lt; 10) {
+
+    sheet.insertColumnsAfter(
+      maxColumns,
+      10 - maxColumns
+    );
+
+  }
+
+  // J1 셀 확인
+  const header = sheet.getRange(1, 10);
+
+  // 비어 있을 때만 머리글 생성
+  if (!toText(header.getValue())) {
+    header.setValue('노션ID');
+  }
+
+}
+
+
+// ================================================
+// 4. 노션 데이터베이스 속성 생성
+// ================================================
+
+function buildProperties(row, timezone) {
+
+  const lectureName = toText(row[0]);
+  const target = toText(row[1]);
+  const date = formatDate(row[2], timezone);
+  const session = toText(row[3]);
+  const topic = toText(row[4]);
+  const goal = toText(row[5]);
+  const content = toText(row[6]);
+  const note = toText(row[7]);
+
+  // 노션 속성 이름을 정확히 사용
+  const properties = {
+
+    '강의명': {
+      title: richText(lectureName)
+    },
+
+    '대상': {
+      rich_text: richText(target)
+    },
+
+    '차시': {
+      rich_text: richText(session)
+    },
+
+    '수업주제': {
+      rich_text: richText(topic)
+    },
+
+    '수업목표': {
+      rich_text: richText(goal)
+    },
+
+    '수업내용': {
+      rich_text: richText(content)
+    },
+
+    '비고': {
+      rich_text: richText(note)
+    }
+
+  };
+
+  // 날짜가 있는 경우에만 속성 추가
+  if (date) {
+
+    properties['강의날짜'] = {
+      date: {
+        start: date
+      }
+    };
+
+  }
+
+  return properties;
+
+}
+
+
+// ================================================
+// 5. 신규 페이지 생성용 데이터 만들기
+// ================================================
+
+function buildNotionPayload(row, properties) {
+
+  const target = toText(row[1]);
+  const session = toText(row[3]);
+  const note = toText(row[7]);
+
+  // 새 페이지에만 상태를 "준비중"으로 지정
+  // 기존 페이지 수정 시 상태는 변경하지 않음
+  const createProperties = Object.assign(
+    {},
+    properties,
+    {
+      '상태': {
+        status: {
+          name: '준비중'
+        }
+      }
+    }
+  );
+
+  return {
+
+    parent: {
+      database_id: DATABASE_ID
+    },
+
+    properties: createProperties,
+
+    // 신규 생성일 때만 본문 추가
+    children: buildPageChildren(
+      target,
+      session,
+      note
+    )
+
+  };
+
+}
+
+
+// ================================================
+// 6. 노션 페이지 본문 생성
+// 신규 페이지에서만 사용
+// ================================================
+
+function buildPageChildren(target, session, note) {
+
+  const summary =
+    '대상: ' + (target || '-') +
+    ' · 차시: ' + (session || '-') +
+    ' · 비고: ' + (note || '-');
+
+  return [
+
+    // ① 💡 콜아웃
+    {
+      object: 'block',
+      type: 'callout',
+
+      callout: {
+
+        icon: {
+          type: 'emoji',
+          emoji: '💡'
+        },
+
+        rich_text: richText(
+          summary,
+          true
+        )
+
+      }
+    },
+
+    // ② 지도안
+    heading2('🎯 지도안 (도입-전개-정리)'),
+
+    // 빈 문단
+    emptyBlock('paragraph'),
+
+    // ③ 준비물 및 체크리스트
+    heading2('🧰 준비물 · 체크리스트'),
+
+    // 빈 체크박스 1개
+    {
+      object: 'block',
+      type: 'to_do',
+
+      to_do: {
+        rich_text: [],
+        checked: false
+      }
+    },
+
+    // ④ 자료 링크
+    heading2('📎 자료 링크'),
+
+    // 빈 불릿
+    emptyBlock('bulleted_list_item'),
+
+    // ⑤ 강의 후 메모
+    heading2('📝 강의 후 메모'),
+
+    // 빈 문단
+    emptyBlock('paragraph')
+
+  ];
+
+}
+
+
+// ================================================
+// 7. heading_2 블록 만들기
+// ================================================
+
+function heading2(text) {
+
+  return {
+
+    object: 'block',
+    type: 'heading_2',
+
+    heading_2: {
+      rich_text: richText(text)
+    }
+
+  };
+
+}
+
+
+// ================================================
+// 8. 빈 문단 / 빈 불릿 만들기
+// ================================================
+
+function emptyBlock(type) {
+
+  const block = {
+    object: 'block',
+    type: type
+  };
+
+  block[type] = {
+    rich_text: []
+  };
+
+  return block;
+
+}
+
+
+// ================================================
+// 9. 노션 rich_text 변환
+// ================================================
+
+function richText(value, bold = false) {
+
+  const text = String(value || '');
+
+  if (!text) {
+    return [];
+  }
+
+  const result = [];
+
+  // 유니코드 문자 단위로 분리
+  const chars = Array.from(text);
+
+  // 노션 텍스트 객체당 2000자 제한 대응
+  for (
+    let i = 0;
+    i &lt; chars.length;
+    i += 1900
+  ) {
+
+    const part = chars
+      .slice(i, i + 1900)
+      .join('');
+
+    result.push({
+
+      type: 'text',
+
+      text: {
+        content: part
+      },
+
+      // annotations는 text 바깥에 배치
+      annotations: {
+        bold: bold
+      }
+
+    });
+
+  }
+
+  // 노션 rich_text 배열 제한
+  if (result.length &gt; 100) {
+
+    throw new Error(
+      '텍스트가 노션의 길이 제한을 초과했습니다.'
+    );
+
+  }
+
+  return result;
+
+}
+
+
+// ================================================
+// 10. 셀 값을 문자열로 변환
+// ================================================
+
+function toText(value) {
+
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return '';
+  }
+
+  return String(value).trim();
+
+}
+
+
+// ================================================
+// 11. 날짜 형식 통일
+// YYYY-MM-DD
+// ================================================
+
+function formatDate(value, timezone) {
+
+  // 날짜가 없는 경우
+  if (
+    value === '' ||
+    value === null ||
+    value === undefined
+  ) {
+    return null;
+  }
+
+  // 구글 시트 날짜 객체 처리
+  if (value instanceof Date) {
+
+    if (isNaN(value.getTime())) {
+      throw new Error(
+        '유효하지 않은 날짜입니다.'
+      );
+    }
+
+    return Utilities.formatDate(
+      value,
+      timezone,
+      'yyyy-MM-dd'
+    );
+
+  }
+
+  const text = String(value).trim();
+
+  if (!text) {
+    return null;
+  }
+
+  // 지원 형식
+  // 2026.9.25
+  // 2026-9-25
+  // 2026/9/25
+  // 2026. 9. 25.
+  // 2026-09-25T00:00:00
+
+  const match = text.match(
+    /^(\d{4})[.\-/]\s*(\d{1,2})[.\-/]\s*(\d{1,2})(?:\.)?(?=$|T|\s)/
+  );
+
+  if (!match) {
+
+    throw new Error(
+      '날짜 형식 오류: ' + text
+    );
+
+  }
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+
+  // 존재하지 않는 날짜 검사
+  const checkDate = new Date(
+    Date.UTC(year, month - 1, day)
+  );
+
+  if (
+    checkDate.getUTCFullYear() !== year ||
+    checkDate.getUTCMonth() + 1 !== month ||
+    checkDate.getUTCDate() !== day
+  ) {
+
+    throw new Error(
+      '존재하지 않는 날짜: ' + text
+    );
+
+  }
+
+  // 월과 일을 두 자리로 변환
+  const mm = String(month).padStart(
+    2,
+    '0'
+  );
+
+  const dd = String(day).padStart(
+    2,
+    '0'
+  );
+
+  return year + '-' + mm + '-' + dd;
+
+}
+
+
+// ================================================
+// 12. 노션 API 공통 호출 함수
+// ================================================
+
+function callNotionApi(url, method, payload) {
+
+  const options = {
+
+    method: method,
+
+    contentType: 'application/json',
+
+    headers: {
+
+      Authorization:
+        'Bearer ' + NOTION_TOKEN,
+
+      // API 버전 고정
+      'Notion-Version': '2022-06-28'
+
+    },
+
+    payload: JSON.stringify(payload),
+
+    // HTTP 오류가 발생해도 응답 내용 읽기
+    muteHttpExceptions: true
+
+  };
+
+  // 노션 API 요청
+  const response = UrlFetchApp.fetch(
+    url,
+    options
+  );
+
+  const status = response.getResponseCode();
+
+  const responseText = response.getContentText();
+
+  let result;
+
+  // JSON 응답 해석
+  try {
+
+    result = JSON.parse(
+      responseText
+    );
+
+  } catch (error) {
+
+    const parseError = new Error(
+      '노션 응답을 해석할 수 없습니다. HTTP ' +
+      status
+    );
+
+    parseError.statusCode = status;
+
+    throw parseError;
+
+  }
+
+  // HTTP 오류 발생
+  if (
+    status &lt; 200 ||
+    status &gt;= 300
+  ) {
+
+    const message =
+      result.message ||
+      '알 수 없는 노션 오류';
+
+    const apiError = new Error(
+      'HTTP ' + status + ': ' + message
+    );
+
+    // 오류 종류를 판단할 수 있도록 상태 코드 저장
+    apiError.statusCode = status;
+
+    throw apiError;
+
+  }
+
+  return result;
+
+}
+
+
+// ================================================
+// 13. 노션 새 페이지 생성 (POST)
+// ================================================
+
+function createNotionPage(payload) {
+
+  const url =
+    'https://api.notion.com/v1/pages';
+
+  const result = callNotionApi(
+    url,
+    'post',
+    payload
+  );
+
+  // 페이지 ID가 있어야 정상 생성
+  if (!result.id) {
+
+    throw new Error(
+      '노션에서 페이지 ID가 반환되지 않았습니다.'
+    );
+
+  }
+
+  return result;
+
+}
+
+
+// ================================================
+// 14. 기존 페이지 속성만 수정 (PATCH)
+// ================================================
+
+function updateNotionPage(pageId, properties) {
+
+  const url =
+    'https://api.notion.com/v1/pages/' +
+    encodeURIComponent(pageId);
+
+  // 매우 중요:
+  // properties만 전송
+  // children은 절대 전송하지 않음
+  //
+  // 노션에 직접 작성한 지도안,
+  // 체크리스트, 자료 링크, 메모는 유지됨
+
+  const payload = {
+    properties: properties
+  };
+
+  const result = callNotionApi(
+    url,
+    'patch',
+    payload
+  );
+
+  if (!result.id) {
+
+    throw new Error(
+      '수정된 페이지 ID가 반환되지 않았습니다.'
+    );
+
+  }
+
+  return result;
+
+}
+
+/*************************************************
+ * 🤖 AI 지도안 생성 기능
+ *
+ * - 전체 행 / 선택 행 실행
+ * - J열 노션ID 사용
+ * - 이미 작성된 지도안은 건너뛰기
+ * - Groq로 90분 지도안 생성
+ * - 노션 지도안 제목 바로 아래 삽입
+ * - 429 오류 시 20초 후 1회 재시도
+ *************************************************/
+
+
+// ================================================
+// 15. 전체 강의 지도안 생성
+// ================================================
+
+function generateAllLessonPlans() {
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_NAME);
+
+  if (!sheet) {
+    SpreadsheetApp.getUi().alert(
+      '시트를 찾을 수 없습니다: ' + SHEET_NAME
+    );
+    return;
+  }
+
+  const lastRow = sheet.getLastRow();
+
+  // 2행부터 마지막 행까지 처리
+  const rowNumbers = [];
+
+  for (let r = 2; r &lt;= lastRow; r++) {
+    rowNumbers.push(r);
+  }
+
+  runLessonGeneration(sheet, rowNumbers);
+
+}
+
+
+// ================================================
+// 16. 선택한 행만 지도안 생성
+// ================================================
+
+function generateSelectedLessonPlans() {
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_NAME);
+
+  if (!sheet) {
+    SpreadsheetApp.getUi().alert('시트를 찾을 수 없습니다.');
+    return;
+  }
+
+  // 현재 선택한 시트가 대상 시트인지 확인
+  if (ss.getActiveSheet().getSheetId() !== sheet.getSheetId()) {
+    SpreadsheetApp.getUi().alert(
+      SHEET_NAME + ' 시트에서 행을 선택해 주세요.'
+    );
+    return;
+  }
+
+  const selection = sheet.getActiveRangeList();
+
+  if (!selection) {
+    SpreadsheetApp.getUi().alert('행을 선택해 주세요.');
+    return;
+  }
+
+  const rowNumbers = [];
+  const lastRow = sheet.getLastRow();
+
+  // 선택 영역에 포함된 행 번호 수집
+  selection.getRanges().forEach(range =&gt; {
+
+    const start = Math.max(2, range.getRow());
+    const end = Math.min(lastRow, range.getLastRow());
+
+    for (let r = start; r &lt;= end; r++) {
+      rowNumbers.push(r);
+    }
+
+  });
+
+  // 중복 행 제거 및 정렬
+  const uniqueRows = [...new Set(rowNumbers)]
+    .sort((a, b) =&gt; a - b);
+
+  runLessonGeneration(sheet, uniqueRows);
+
+}
+
+
+// ================================================
+// 17. AI 지도안 생성 공통 실행 함수
+// ================================================
+
+function runLessonGeneration(sheet, rowNumbers) {
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ui = SpreadsheetApp.getUi();
+
+  // API 키 설정 확인
+  if (
+    !GROQ_API_KEY ||
+    GROQ_API_KEY === '그록 API Key를 넣어주세요'
+  ) {
+    ui.alert('GROQ_API_KEY를 먼저 입력해 주세요.');
+    return;
+  }
+
+  // 중복 실행 방지
+  const lock = LockService.getDocumentLock();
+
+  if (!lock.tryLock(1000)) {
+    ui.alert('이미 작업이 실행 중입니다.');
+    return;
+  }
+
+  let created = 0;
+  let skipped = 0;
+  let failed = 0;
+
+  const total = rowNumbers.length;
+
+  try {
+
+    for (let i = 0; i &lt; total; i++) {
+
+      const rowNumber = rowNumbers[i];
+
+      // 진행률 표시
+      ss.toast(
+        (i + 1) + ' / ' + total + ' 처리 중',
+        '🤖 AI 지도안 생성',
+        5
+      );
+
+      // A~J열 데이터 읽기
+      const row = sheet.getRange(
+        rowNumber, 1, 1, 10
+      ).getValues()[0];
+
+      const lectureName = toText(row[0]);
+      const pageId = toText(row[9]);
+
+      // 강의명 또는 노션ID가 없으면 건너뜀
+      if (!lectureName || !pageId) {
+        skipped++;
+        continue;
+      }
+
+      let geminiCalled = false;
+
+      try {
+
+        // 노션 페이지 본문 읽기
+        const blocks = getLessonPageBlocks(pageId);
+
+        // 지도안 heading_2 찾기
+        const headingIndex = blocks.findIndex(block =&gt; {
+
+          if (block.type !== 'heading_2') {
+            return false;
+          }
+
+          const text = (block.heading_2.rich_text || [])
+            .map(item =&gt; item.plain_text || item.text?.content || '')
+            .join('');
+
+          return text.includes('🎯 지도안');
+
+        });
+
+        if (headingIndex === -1) {
+          throw new Error('🎯 지도안 제목을 찾을 수 없습니다.');
+        }
+
+        const headingBlock = blocks[headingIndex];
+
+        // 헤딩 바로 다음 블록 확인
+        const nextBlock = blocks[headingIndex + 1];
+
+        // 내용이 있으면 이미 생성된 것으로 판단
+        if (nextBlock &amp;&amp; hasLessonBlockContent(nextBlock)) {
+          skipped++;
+          continue;
+        }
+
+        // AI 프롬프트 생성
+        const prompt = buildLessonPrompt(row);
+
+        // AI 요청
+        geminiCalled = true;
+        const aiText = callGeminiLesson(prompt);
+
+        // AI 결과를 노션 블록으로 변환
+        const newBlocks = convertLessonToBlocks(aiText);
+
+        if (newBlocks.length === 0) {
+          throw new Error('AI가 빈 지도안을 반환했습니다.');
+        }
+
+        // 지도안 제목 바로 아래에 삽입
+        appendLessonBlocks(
+          pageId,
+          headingBlock.id,
+          newBlocks
+        );
+
+        created++;
+
+        console.log(
+          rowNumber + '행 지도안 생성 완료'
+        );
+
+      } catch (error) {
+
+        failed++;
+
+        console.error(
+          rowNumber + '행 지도안 생성 실패: ' +
+          error.message
+        );
+
+      } finally {
+
+        // AI 요청이 있었으면 다음 행 처리 전 4초 대기
+        if (geminiCalled) {
+          Utilities.sleep(4000);
+        }
+
+      }
+
+    }
+
+  } finally {
+    lock.releaseLock();
+  }
+
+  // 완료 알림
+  ss.toast('지도안 생성 작업 완료', '🤖 완료', 5);
+
+  ui.alert(
+    'AI 지도안 생성 완료\n\n' +
+    '✅ 생성: ' + created + '건\n' +
+    '⏭️ 건너뜀: ' + skipped + '건\n' +
+    '❌ 실패: ' + failed + '건\n\n' +
+    '실패 상세 내용은 Apps Script 실행 로그를 확인하세요.'
+  );
+
+}
+
+
+// ================================================
+// 18. 노션 페이지 본문 전체 읽기
+// GET /blocks/{page_id}/children
+// ================================================
+
+function getLessonPageBlocks(pageId) {
+
+  const blocks = [];
+  let cursor = null;
+
+  do {
+
+    let url =
+      'https://api.notion.com/v1/blocks/' +
+      encodeURIComponent(pageId) +
+      '/children?page_size=100';
+
+    if (cursor) {
+      url += '&amp;start_cursor=' + encodeURIComponent(cursor);
+    }
+
+    const result = notionLessonRequest(
+      url,
+      'get'
+    );
+
+    blocks.push(...(result.results || []));
+
+    cursor = result.has_more
+      ? result.next_cursor
+      : null;
+
+  } while (cursor);
+
+  return blocks;
+
+}
+
+
+// ================================================
+// 19. 헤딩 바로 아래 블록에 내용이 있는지 검사
+// ================================================
+
+function hasLessonBlockContent(block) {
+
+  if (!block) return false;
+
+  // 빈 문단, 빈 불릿, 빈 체크박스 확인
+  const textTypes = [
+    'paragraph',
+    'bulleted_list_item',
+    'numbered_list_item',
+    'to_do'
+  ];
+
+  if (textTypes.includes(block.type)) {
+
+    const data = block[block.type] || {};
+
+    const text = (data.rich_text || [])
+      .map(item =&gt; item.plain_text || item.text?.content || '')
+      .join('')
+      .trim();
+
+    // 하위 블록이 있다면 내용이 있다고 판단
+    return Boolean(text || block.has_children);
+
+  }
+
+  // 그 외 블록은 기존 콘텐츠로 보고 보호
+  return true;
+
+}
+
+
+// ================================================
+// 20. 지도안 프롬프트 만들기
+// ================================================
+
+function buildLessonPrompt(row) {
+
+  const lectureName = toText(row[0]);
+  const target = toText(row[1]);
+  const session = toText(row[3]);
+  const topic = toText(row[4]);
+  const goal = toText(row[5]);
+  const content = toText(row[6]);
+  const condition = toText(row[7]);
+
+  return `너는 교육과정 재구성 전문가야.
+아래 [강의 정보]를 바탕으로 90분 기준 교수·학습 과정안(지도안)을 작성해줘.
+
+[강의 정보]
+강의명 : ${lectureName}
+대상 : ${target}
+차시 : ${session}
+수업주제 : ${topic}
+수업목표 : ${goal}
+수업내용 : ${content}
+수업조건 : ${condition}
+
+[작성 규칙]
+- 구성 : 도입(10분) / 전개1(30분) / 전개2(40분) / 정리(10분)
+- 각 단계는 아래 세 줄로만 작성하고, 세 줄을 넘기지 말 것
+  · 활동 : 무엇을 하는지 한 문장
+  · 발화 : 강사가 실제로 할 말 한 문장 (구어체)
+  · 유의 : 놓치기 쉬운 것 한 문장
+- 핵심 발문 2개
+- 준비물 4개 이내
+- 시간이 부족할 때 줄일 활동 1개
+- [수업조건]에 인원·환경·수준·제약이 있으면 반드시 반영할 것
+- 전체 분량은 A4 한 장 이내
+- 수사나 설명 없이 현장에서 바로 읽는 문장으로 쓸 것
+- 같은 내용을 다른 말로 반복하지 말 것
+
+[출력 형식]  아래 기호만 사용할 것
+- 소제목은 '## '로 시작
+- 항목은 '- '로 시작
+- 표, 코드블록, ** 강조 기호는 절대 사용하지 말 것
+- 반드시 한국어로만 작성하고 한자·중국어·일본어는 섞지 말 것`;
+
+}
+
+
+
+/*************************************************
+ * 21. Groq AI 지도안 생성
+ *
+ * 함수 이름: callGeminiLesson (기존 이름 유지)
+ * 모델: openai/gpt-oss-120b
+ *
+ * HTTP 429 발생 시:
+ * 20초 대기 후 한 번만 재시도
+ *************************************************/
+
+function callGeminiLesson(prompt) {
+
+  // Groq API 주소
+  const url =
+    'https://api.groq.com/openai/v1/chat/completions';
+
+  // Groq 요청 데이터
+  const payload = {
+
+    model: GROQ_MODEL,
+
+    messages: [
+      {
+        role: 'user',
+        content: prompt
+      }
+    ],
+
+    // 결과의 일관성을 높이기 위한 설정
+    temperature: 0.4,
+
+    // GPT-OSS 추론 강도
+    reasoning_effort: 'low'
+
+  };
+
+  const options = {
+
+    method: 'post',
+
+    contentType: 'application/json',
+
+    headers: {
+      Authorization: 'Bearer ' + GROQ_API_KEY
+    },
+
+    payload: JSON.stringify(payload),
+
+    muteHttpExceptions: true
+
+  };
+
+  // 최대 2회 요청
+  for (let attempt = 0; attempt &lt; 2; attempt++) {
+
+    const response = UrlFetchApp.fetch(url, options);
+
+    const status = response.getResponseCode();
+    const responseText = response.getContentText();
+
+    // 429 요청 제한 시 20초 대기 후 재시도
+    if (status === 429 &amp;&amp; attempt === 0) {
+
+      console.log(
+        'Groq 요청 제한 발생. 20초 후 재시도합니다.'
+      );
+
+      Utilities.sleep(20000);
+      continue;
+
+    }
+
+    let result;
+
+    try {
+      result = JSON.parse(responseText);
+    } catch (error) {
+      throw new Error(
+        'Groq 응답 해석 실패: HTTP ' + status
+      );
+    }
+
+    // API 오류 처리
+    if (status &lt; 200 || status &gt;= 300) {
+
+      const message =
+        result.error?.message || '알 수 없는 Groq 오류';
+
+      throw new Error(
+        'Groq HTTP ' + status + ': ' + message
+      );
+
+    }
+
+    // Groq 응답에서 생성된 텍스트 추출
+    const text =
+      result.choices?.[0]?.message?.content?.trim();
+
+    if (!text) {
+      throw new Error(
+        'Groq 응답에 지도안 텍스트가 없습니다.'
+      );
+    }
+
+    return text;
+
+  }
+
+  throw new Error(
+    'Groq 요청 제한으로 지도안 생성에 실패했습니다.'
+  );
+
+}
+
+
+
+// ================================================
+// 22. AI 출력 → 노션 블록 변환
+// ================================================
+
+function convertLessonToBlocks(aiText) {
+
+  const lines = aiText.split(/\r?\n/);
+  const blocks = [];
+
+  lines.forEach(line =&gt; {
+
+    // ** 강조 기호 제거
+    const cleanLine = line
+      .replace(/\*\*/g, '')
+      .trim();
+
+    // 빈 줄 무시
+    if (!cleanLine) return;
+
+    let type;
+    let text;
+
+    if (cleanLine.startsWith('## ')) {
+
+      // ## → heading_3
+      type = 'heading_3';
+      text = cleanLine.substring(3).trim();
+
+    } else if (cleanLine.startsWith('- ')) {
+
+      // - → bulleted_list_item
+      type = 'bulleted_list_item';
+      text = cleanLine.substring(2).trim();
+
+    } else {
+
+      // 그 외 → paragraph
+      type = 'paragraph';
+      text = cleanLine;
+
+    }
+
+    if (!text) return;
+
+    // 기존 richText 함수 재사용
+    const block = {
+      object: 'block',
+      type: type
+    };
+
+    block[type] = {
+      rich_text: richText(text)
+    };
+
+    blocks.push(block);
+
+  });
+
+  // 노션 API는 한 번에 최대 100개 블록
+  return blocks.slice(0, 100);
+
+}
+
+
+// ================================================
+// 23. 노션 지도안 헤딩 바로 아래에 블록 삽입
+// PATCH /blocks/{page_id}/children
+// ================================================
+
+function appendLessonBlocks(pageId, headingId, blocks) {
+
+  const url =
+    'https://api.notion.com/v1/blocks/' +
+    encodeURIComponent(pageId) +
+    '/children';
+
+  const payload = {
+
+    // 새 블록이 들어갈 위치
+    after: headingId,
+
+    // AI가 만든 지도안 블록
+    children: blocks
+
+  };
+
+  return notionLessonRequest(
+    url,
+    'patch',
+    payload
+  );
+
+}
+
+
+// ================================================
+// 24. 지도안 기능 전용 노션 API 요청
+// 기존 Notion-Version 유지
+// ================================================
+
+function notionLessonRequest(url, method, payload) {
+
+  const options = {
+
+    method: method,
+
+    headers: {
+      Authorization: 'Bearer ' + NOTION_TOKEN,
+      'Notion-Version': '2022-06-28'
+    },
+
+    muteHttpExceptions: true
+
+  };
+
+  // POST, PATCH 등 본문이 있는 요청만 설정
+  if (payload !== undefined) {
+
+    options.contentType = 'application/json';
+    options.payload = JSON.stringify(payload);
+
+  }
+
+  const response = UrlFetchApp.fetch(url, options);
+  const status = response.getResponseCode();
+
+  let result;
+
+  try {
+    result = JSON.parse(response.getContentText());
+  } catch (error) {
+    throw new Error(
+      '노션 응답 해석 실패: HTTP ' + status
+    );
+  }
+
+  if (status &lt; 200 || status &gt;= 300) {
+
+    const message =
+      result.message || '알 수 없는 노션 오류';
+
+    throw new Error(
+      'Notion HTTP ' + status + ': ' + message
+    );
+
+  }
+
+  return result;
+
+}</textarea>
+      <p class="goal" style="margin-top:8px"><b>기존 코드를 모두 지우고</b> 이 코드를 붙여 넣습니다. 맨 위 <b>노션 토큰 · DATABASE ID · Groq 키</b>만 내 것으로 바꾸면 됩니다. 시트의 J열 ID와 노션 페이지는 그대로 이어서 씁니다.</p>
+    </div>
+    </details>
+
+    <div class="note">
+      <b>Groq 모델은 바뀝니다.</b> Gemini처럼 latest 별칭이 없어서 모델 ID를 직접 적습니다.<br>
+      "모델이 없다"는 오류가 나면 <a href="https://console.groq.com/docs/models" target="_blank" rel="noopener">console.groq.com/docs/models</a> 의 Production Models에서 글쓰기용 모델을 골라 <code class="kbd">GROQ_MODEL</code> 만 바꿉니다.<br>
+      2026년 10월 기준 : <code class="kbd">openai/gpt-oss-120b</code> (기본) → 안 되면 <code class="kbd">openai/gpt-oss-20b</code>
+    </div>
+  </details>
+
+  <div class="card">
+    <h2>작업 규칙</h2>
+    <ul class="check">
+      <li>한 번에 기능 하나씩 추가합니다</li>
+      <li>동작하는 코드는 v1 / v2 / v3 … 로 따로 저장해둡니다</li>
+      <li>AI와는 같은 대화창에서 이어갑니다 (새 창은 기존 코드를 모릅니다)</li>
+      <li>앞 기능이 살아있는지 확인하고 다음으로 넘어갑니다</li>
+      <li>15분 넘게 막히면 이 페이지의 완성 코드를 사용합니다</li>
+      <li>지도안 생성은 <b>한 번에 1~2건씩</b></li>
+    </ul>
+  </div>
+</section>
+
+</div>
+
+<script>
+  // 섹션 보이기
+  function showSection(id) {
+    document.querySelectorAll("section").forEach(function (s) { s.classList.remove("on"); });
+    document.getElementById(id).classList.add("on");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // 위 메뉴 전환
+  document.getElementById("tabs").addEventListener("click", function (e) {
+    var btn = e.target.closest("button");
+    if (!btn) return;
+
+    document.querySelectorAll("#tabs button").forEach(function (b) { b.classList.remove("on"); });
+    btn.classList.add("on");
+
+    var g = btn.dataset.g;
+    var sub = null;
+
+    document.querySelectorAll("nav.sub").forEach(function (n) {
+      var match = n.dataset.for === g;
+      n.classList.toggle("on", match);
+      if (match) sub = n;
+    });
+
+    // 아래 메뉴가 있으면 선택된 단계를, 없으면 메뉴 이름과 같은 섹션을 보여줌
+    showSection(sub ? sub.querySelector("button.on").dataset.t : g);
+  });
+
+  // 아래 메뉴 전환
+  document.querySelectorAll("nav.sub").forEach(function (n) {
+    n.addEventListener("click", function (e) {
+      var btn = e.target.closest("button");
+      if (!btn) return;
+
+      n.querySelectorAll("button").forEach(function (b) { b.classList.remove("on"); });
+      btn.classList.add("on");
+
+      showSection(btn.dataset.t);
+    });
+  });
+
+  // 텍스트 복사 공통
+  function copyText(text, btn, label) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.top = "-1000px";
+    document.body.appendChild(ta);
+    ta.select();
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).catch(function () {
+        document.execCommand("copy");
+      });
+    } else {
+      document.execCommand("copy");
+    }
+
+    document.body.removeChild(ta);
+
+    var old = btn.textContent;
+    btn.textContent = label;
+    btn.classList.add("done");
+
+    setTimeout(function () {
+      btn.textContent = old;
+      btn.classList.remove("done");
+    }, 1300);
+  }
+
+  // 항목 하나만 복사
+  document.querySelectorAll(".copy-one").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var row = btn.closest(".field");
+      copyText(row.querySelector(".fv").textContent.trim(), btn, "완료");
+    });
+  });
+
+  // 항목 전체 복사
+  document.querySelectorAll(".copy-all").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var box = btn.closest(".blk").querySelector(".fields");
+      var lines = [];
+
+      box.querySelectorAll(".field").forEach(function (f) {
+        lines.push(
+          f.querySelector(".fk").textContent.trim() + " : " +
+          f.querySelector(".fv").textContent.trim()
+        );
+      });
+
+      copyText(lines.join("\n"), btn, "복사됨");
+    });
+  });
+
+  // 프롬프트 펼치기 버튼 (복사 버튼 왼쪽에 자동 추가)
+  document.querySelectorAll("textarea.prompt").forEach(function (box) {
+    var copyBtn = box.closest(".blk").querySelector(".blk-head .copy");
+    if (!copyBtn) return;
+
+    var wrap = document.createElement("div");
+    wrap.className = "btns";
+    copyBtn.parentNode.insertBefore(wrap, copyBtn);
+
+    var btn = document.createElement("button");
+    btn.className = "expand";
+    btn.textContent = "펼치기";
+    wrap.appendChild(btn);
+    wrap.appendChild(copyBtn);
+
+    btn.addEventListener("click", function () {
+      if (box.dataset.open) {
+        box.style.height = "";
+        delete box.dataset.open;
+        btn.textContent = "펼치기";
+      } else {
+        box.style.height = (box.scrollHeight + 4) + "px";
+        box.dataset.open = "1";
+        btn.textContent = "접기";
+      }
+    });
+  });
+
+  // 스크롤 없이 내용 길이만큼 늘어나는 칸 (접힌 상자를 펼칠 때 · 창 크기 바뀔 때 다시 맞춤)
+  function fitAutosize() {
+    document.querySelectorAll("textarea.autosize").forEach(function (box) {
+      if (!box.offsetParent) return;
+      box.style.height = "auto";
+      box.style.height = (box.scrollHeight + 4) + "px";
+    });
+  }
+  document.querySelectorAll("details.fold").forEach(function (d) {
+    d.addEventListener("toggle", fitAutosize);
+  });
+  document.getElementById("tabs").addEventListener("click", function () { setTimeout(fitAutosize, 0); });
+  window.addEventListener("resize", fitAutosize);
+
+  // 복사 버튼
+  document.querySelectorAll(".copy").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var box = btn.closest(".blk, .card").querySelector("textarea");
+      if (!box) return;
+
+      box.select();
+      box.setSelectionRange(0, 999999);
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(box.value).catch(function () {
+          document.execCommand("copy");
+        });
+      } else {
+        document.execCommand("copy");
+      }
+
+      var old = btn.textContent;
+      btn.textContent = "복사됨";
+      btn.classList.add("done");
+
+      setTimeout(function () {
+        btn.textContent = old;
+        btn.classList.remove("done");
+      }, 1400);
+    });
+  });
+</script>
+
+</body>
+</html>
