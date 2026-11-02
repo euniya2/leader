@@ -175,13 +175,14 @@
   .field:last-child{border-bottom:none}
   .field .fk{flex:0 0 76px; color:var(--sub); font-weight:700}
   .field .fv{flex:1 1 auto; min-width:0; word-break:break-word}
-  .copy-one{
+  .copy-one, .copy-cell{
     flex:0 0 auto; border:1px solid var(--line); background:#fff; color:var(--sub);
     padding:4px 10px; border-radius:7px; font-size:12px; cursor:pointer;
     font-family:inherit; font-weight:600;
   }
-  .copy-one:hover{border-color:var(--accent); color:var(--accent)}
-  .copy-one.done{background:var(--accent); border-color:var(--accent); color:#fff}
+  .copy-cell{margin-left:6px}
+  .copy-one:hover, .copy-cell:hover{border-color:var(--accent); color:var(--accent)}
+  .copy-one.done, .copy-cell.done{background:var(--accent); border-color:var(--accent); color:#fff}
   @media (max-width:600px){
     .field{flex-wrap:wrap}
     .field .fk{flex:0 0 100%}
@@ -284,16 +285,22 @@
     </div>
     <table>
       <tr><th style="width:50px">순번</th><th>속성명</th><th>노션 타입</th><th>시트 열</th></tr>
-      <tr><td>1</td><td>강의명</td><td>제목 (title)</td><td>A</td></tr>
-      <tr><td>2</td><td>대상</td><td>텍스트</td><td>B</td></tr>
-      <tr><td>3</td><td>강의날짜</td><td>날짜</td><td>C</td></tr>
-      <tr><td>4</td><td>차시</td><td>텍스트 <b>(숫자 아님)</b></td><td>D</td></tr>
-      <tr><td>5</td><td>수업주제</td><td>텍스트</td><td>E</td></tr>
-      <tr><td>6</td><td>수업목표</td><td>텍스트</td><td>F</td></tr>
-      <tr><td>7</td><td>수업내용</td><td>텍스트</td><td>G</td></tr>
-      <tr><td>8</td><td>비고</td><td>텍스트</td><td>H</td></tr>
-      <tr><td>9</td><td>상태</td><td>상태 (status) — 옵션 이름 바꾸기 : <b>시작 전 → 진행예정</b> · <b>진행 중 → 준비중</b> (완료는 그대로)</td><td>—</td></tr>
+      <tr><td>1</td><td><b>강의명</b> <button class="copy-cell" data-copy="강의명">복사</button></td><td>제목 (title)</td><td>A</td></tr>
+      <tr><td>2</td><td><b>대상</b> <button class="copy-cell" data-copy="대상">복사</button></td><td>텍스트</td><td>B</td></tr>
+      <tr><td>3</td><td><b>강의날짜</b> <button class="copy-cell" data-copy="강의날짜">복사</button></td><td>날짜</td><td>C</td></tr>
+      <tr><td>4</td><td><b>차시</b> <button class="copy-cell" data-copy="차시">복사</button></td><td>텍스트 <b>(숫자 아님)</b></td><td>D</td></tr>
+      <tr><td>5</td><td><b>수업주제</b> <button class="copy-cell" data-copy="수업주제">복사</button></td><td>텍스트</td><td>E</td></tr>
+      <tr><td>6</td><td><b>수업목표</b> <button class="copy-cell" data-copy="수업목표">복사</button></td><td>텍스트</td><td>F</td></tr>
+      <tr><td>7</td><td><b>수업내용</b> <button class="copy-cell" data-copy="수업내용">복사</button></td><td>텍스트</td><td>G</td></tr>
+      <tr><td>8</td><td><b>비고</b> <button class="copy-cell" data-copy="비고">복사</button></td><td>텍스트</td><td>H</td></tr>
+      <tr><td>9</td><td><b>상태</b> <button class="copy-cell" data-copy="상태">복사</button></td><td>상태 (status) — 옵션 이름 바꾸기 : <b>시작 전 → 진행예정</b> <button class="copy-cell" data-copy="진행예정">복사</button> · <b>진행 중 → 준비중</b> <button class="copy-cell" data-copy="준비중">복사</button> (완료는 그대로)</td><td>—</td></tr>
     </table>
+
+    <div class="note">
+      <b>속성 이름은 시트 · 코드와 짝이 됩니다.</b> 코드는 이 이름으로 노션 칸을 찾습니다.<br>
+      <b>글자 · 띄어쓰기까지 똑같이</b> — <code class="kbd">수업목표</code> ✅ <code class="kbd">수업 목표</code> ❌ · 상태 옵션 <code class="kbd">준비중</code> ✅ <code class="kbd">준비 중</code> ❌<br>
+      직접 치지 말고 <b>복사 버튼</b>으로 붙여 넣으세요.
+    </div>
   </div>
 
   <div class="card">
@@ -494,6 +501,7 @@
       <textarea class="short" style="height:52px" readonly>강의명	대상	강의날짜	차시	수업주제	수업목표	수업내용	비고	완료</textarea>
     </div>
     <p class="goal" style="margin-top:10px">I열은 머리글만 두고, 아래 칸은 코드가 채웁니다. J열(노션ID)은 v2에서 코드가 직접 만듭니다.</p>
+    <p class="goal" style="margin-top:6px">머리글은 노션 속성 이름과 <b>똑같이</b> — 위 복사 버튼으로 붙여 넣으면 틀리지 않습니다. 시트 탭 이름은 <code class="kbd">강의목록</code> (아래 <b>시트1</b> 탭 더블클릭 → 이름 바꾸기)</p>
   </div>
 
   <div class="card">
@@ -3836,6 +3844,13 @@ function notionLessonRequest(url, method, payload) {
       btn.classList.remove("done");
     }, 1300);
   }
+
+  // 표 안의 이름 복사
+  document.querySelectorAll(".copy-cell").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      copyText(btn.dataset.copy, btn, "완료");
+    });
+  });
 
   // 항목 하나만 복사
   document.querySelectorAll(".copy-one").forEach(function (btn) {
